@@ -64,9 +64,23 @@ int checkForColumn(char* check)
     return sortColumn;
 }
 
-void parseEntries()
+char* getFirstValue(char* entry, int startIndex)
 {
-    
+    int endIndex = getSize(entry);
+    for (int i = startIndex; i < endIndex; i++)
+    {
+        if (entry[i] == ',') {
+            char* value = malloc(i - startIndex + 1);
+            if (i - startIndex == 0) {
+                value[0] = '\0';
+                return value;
+            }
+            memcpy(value, &entry[startIndex], i - startIndex);
+            value[i-startIndex] = '\0';
+            return value;
+        }
+    }
+    return NULL;
 }
 
 int main(int varc, char* argv[])
@@ -80,14 +94,16 @@ int main(int varc, char* argv[])
     fgets(buffer, 2500, data);
     
     int actualSize = getSize(buffer);
-    const char symb[2] = ",";
     char** cols = malloc(actualSize * 2);
-    char* token = strtok(buffer, symb);
+    int currIndex = 0;
+    char* token = getFirstValue(buffer, currIndex);
     while(token != NULL) {
         cols[columnSize] = token;
-        token = strtok(NULL, symb);
+        currIndex += getSize(token) + 1;
+        token = getFirstValue(buffer, currIndex);
         columnSize++;
     }
+
     columns = malloc(sizeof(cols));
     columns->data = cols;
     int columnId = checkForColumn(argv[2]);
@@ -108,20 +124,23 @@ int main(int varc, char* argv[])
     {
         int index = 0;
         actualSize = getSize(buffer);
-        csventry *entry = malloc(sizeof(csventry));
-        entry->data = malloc(1000);
-        char* tok = strtok(buffer, symb);
+        csventry entry;
+        entry.data = malloc(actualSize * 2);
+        int ind = 0;
+        char* tok = getFirstValue(buffer, ind);
         while(tok != NULL) {
-            strcpy(entry->data[index], tok);
-            tok = strtok(NULL, symb);
+            int tokSize = getSize(tok);
+            entry.data[index] = malloc(tokSize);
+            strcpy(entry.data[index], tok);
+            ind += tokSize + 1;
+            tok = getFirstValue(buffer, ind);
             index++;
         }
-        entries[rows] = *entry;
-        printf("Name: %s, rows: %d, Address: %p\n", entries[rows].data[1], rows, &entry);
+        entries[rows].data = entry.data;
+        printf("Name: %s, rows: %d, Address: %p\n", entries[rows].data[1], rows, &entries[rows]);
         rows++;
     }
     
-    printf("Check: %s\n", entries[5040].data[1]);
     
     free(cols);
     free(columns);
