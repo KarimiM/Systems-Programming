@@ -11,4 +11,8 @@
 
 #include <stdio.h>
 
+typedef struct csventry {
+    char** data;
+    
+} csventry;
 #endif /* simplerCSVsorter_h */
