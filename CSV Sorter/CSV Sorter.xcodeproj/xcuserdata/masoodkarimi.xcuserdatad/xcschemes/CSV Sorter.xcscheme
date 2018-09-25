@@ -63,7 +63,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-c movie_title "
+            argument = "-c director_name"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
