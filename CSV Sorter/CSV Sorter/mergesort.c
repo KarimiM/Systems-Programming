@@ -6,15 +6,13 @@
 //  Copyright © 2018 Masood Karimi. All rights reserved.
 //
 
-#ifndef simplerCSVsorter_h
-#define simplerCSVsorter_h
 
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "simplerCSVsorter.h"
 
-
-#endif /* simplerCSVsorter_h */
 
 
 int cmpString(char* str1, char* str2){
@@ -33,7 +31,7 @@ int cmpInt(int firstInteger, int secondInteger){
 //	return 0;
 //}
 
-void merge(csvEntry* entryArr, int low, int mid, int high, int colID, int numeric){
+void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric){
 	csventry* mergeArr = malloc(sizeof(entryArr));
 	int x = low;
 	int y = mid + 1;
@@ -41,7 +39,7 @@ void merge(csvEntry* entryArr, int low, int mid, int high, int colID, int numeri
 
 	while(x <= mid && y <= high) {
 		if(numeric == 1){  //numeric
-			if(cmpInt(entryArr[x].data[colID], entryArr[y].data[colID]) == 1){
+			if(cmpInt(atoi(entryArr[x].data[colID]), atoi(entryArr[y].data[colID])) == 1){
 				mergeArr[z++] = entryArr[x++];
 			}
 			else mergeArr[z++] = entryArr[y++];
@@ -68,11 +66,11 @@ void merge(csvEntry* entryArr, int low, int mid, int high, int colID, int numeri
 	}
 }
 
-void mergesort(csvEntry* entryArr, int low, int high, int colID, int numeric){
+void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric){
 	if(low<high){
 		int mid = (high+low)/2;
-		mergesort(entryArr, low, mid, colID, numeric);
-		mergesort(entryArr, mid+1, high, colID, numeric);
+		mergesorts(entryArr, low, mid, colID, numeric);
+		mergesorts(entryArr, mid+1, high, colID, numeric);
 		merge(entryArr, low, mid, high, colID, numeric);
 	}
 
