@@ -124,37 +124,63 @@ int cmpInt(int firstInteger, int secondInteger){
 //}
 
 void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric){
-    csventry* mergeArr = malloc(sizeof(entryArr));
-    int x = low;
-    int y = mid + 1;
-    int z = 0;
+    int i, j, k;
+    int n1 = mid - low + 1;
+    int n2 = high - mid;
     
-    while(x <= mid && y <= high) {
-        if(numeric == 1){  //numeric
-            if(cmpInt(atoi(entryArr[x].data[colID]), atoi(entryArr[y].data[colID])) == 1){
-                mergeArr[z++] = entryArr[x++];
+    csventry L[n1];
+    csventry R[n2];
+    
+    for (i = 0; i < n1; i++) {
+        csventry check = entryArr[low + i];
+        //L[i].data = malloc(sizeof(check.data));
+        L[i].data = check.data;
+    }
+    
+    for (j = 0; j < n2; j++) {
+        csventry check = entryArr[mid + 1 + j];
+        //R[j].data = malloc(sizeof(check.data));
+        R[j].data = check.data;
+    }
+    
+    i=0;
+    j=0;
+    k=low;
+    while (i < n1 && j < n2) {
+        if(numeric == 1){
+            int one = atoi(L[i].data[colID]);
+            int two = atoi(R[j].data[colID]);
+            if (one <= two) {
+                entryArr[k] = L[i];
+                i++;
+            } else {
+                entryArr[k] = R[j];
+                j++;
             }
-            else mergeArr[z++] = entryArr[y++];
         }
-        else if(numeric == 0){  //string
-            if(cmpString(entryArr[x].data[colID], entryArr[y].data[colID])== 1){
-                mergeArr[z++] = entryArr[x++];
+        else if(numeric == 0){
+            char* one = L[i].data[colID];
+            char* two = R[j].data[colID];
+            if(cmpString(one, two) == 1){
+                entryArr[k] = L[i];
+                i++;
             }
-            else mergeArr[z++] = entryArr[y++];
+            else{
+                entryArr[k] = R[j];
+                j++;
+            }
         }
-        else{
-            return;
-        }
-        while(x <= mid){
-            mergeArr[z++] = entryArr[x++];
-        }
-        while(y <= high){
-            mergeArr[z++] = entryArr[y++];
-        }
-        while(z >= 0){
-            entryArr[low + z] = mergeArr[z];
-            z = z-1;
-        }
+        k++;
+    }
+    while (i < n1) {
+        entryArr[k] = L[i];
+        i++;
+        k++;
+    }
+    while (j < n2) {
+        entryArr[k] = R[j];
+        j++;
+        k++;
     }
 }
 
@@ -227,8 +253,14 @@ int main(int varc, char* argv[])
                //[2], &entries[rows]);
         rows++;
     }
-    
-    //mergesorts(entries, 0, rows - 1, columnId, isNumeric);
+    for (int i = 0; i < rows; i++) {
+        printf("Facebook likes: %s\n", entries[i].data[columnId]);
+    }
+    mergesorts(entries, 0, rows - 1, columnId, isNumeric);
+    printf("------------\n");
+    for (int i = 0; i < rows; i++) {
+        printf("Facebook likes: %s\n", entries[i].data[columnId]);
+    }
     free(cols);
     free(columns);
     return 0;
