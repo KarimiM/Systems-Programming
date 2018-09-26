@@ -63,7 +63,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-c director_name"
+            argument = "-c director_facebook_likes"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

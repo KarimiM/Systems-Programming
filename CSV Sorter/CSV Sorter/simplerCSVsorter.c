@@ -21,17 +21,24 @@ int columnSize = 0;
 
 int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
 
+const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews", "duration", "director_facebook_likes", "actor_3_facebook_likes", "actor_2_name", "actor_1_facebook_likes", "gross", "genres", "actor_1_name", "movie_title", "num_voted_users", "cast_total_facebook_likes", "actor_3_name", "facenumber_in_poster", "plot_keywords", "movie_imdb_link", "num_user_for_reviews", "language", "country", "content_rating", "budget", "title_year", "actor_2_facebook_likes", "imdb_score", "aspect_ratio", "movie_facebook_likes" };
+
 int isNumeric = 0;
 
-void checkNumeric(int columnId) {
-    if (columnId == 3) {
+void checkNumeric(char *columnName) {
+    if (strcmp(columnName,"duration") == 0) {
         isNumeric = 2;
         return;
     }
-    for (int i = 0; i < 14; i++) {
-        if (columnNumericIds[i] == columnId) {
-            isNumeric = 1;
-            return;
+    for (int i = 0; i < 28; i++) {
+        if (strcmp(columnName,columnTitles[i]) == 0) {
+            printf("I: %d\n", i);
+            for (int j = 0; j < 14; j++) {
+                if (columnNumericIds[j] == i) {
+                    isNumeric = 1;
+                }
+            }
+            break;
         }
     }
 }
@@ -188,16 +195,15 @@ int main(int varc, char* argv[])
         printf("ERROR: Column in argument does not exist.");
         return 1;
     }
-    checkNumeric(columnId);
-    printf("Column Id: %d, isNumeric: %d\n", columnId, isNumeric);
+    checkNumeric(argv[2]);
+    printf("Column: %s, Column Id: %d, isNumeric: %d\n", argv[2], columnId, isNumeric);
     for (int i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
+        //replace whitespaces at end of certain column names
         char c = columns->data[columnSize - 1][i];
         if (c == 13 || c == 10) {
             columns->data[columnSize - 1][i] = '\0';
         }
     }
-    
-    printf("Test: %s, Column Size: %d\n", columns->data[3], columnSize);
     int rows = 0;
     while (fgets(buffer, 2500, data) != NULL)
     {
@@ -222,7 +228,7 @@ int main(int varc, char* argv[])
         rows++;
     }
     
-    mergesorts(entries, 0, rows - 1, columnId, isNumeric);
+    //mergesorts(entries, 0, rows - 1, columnId, isNumeric);
     free(cols);
     free(columns);
     return 0;
