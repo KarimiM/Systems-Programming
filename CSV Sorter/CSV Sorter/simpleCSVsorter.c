@@ -216,9 +216,8 @@ void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric){
 void printCSV(csventry* entries, int rows, csventry* columnArr){
     // printf("Printing to csv");
     
-    printf("%s", originalData[0]);
     int i;
-    for (i = 0; i < rows; i++) {
+    for (i = 0; i < rows + 1; i++) {
         int index = entries[i].originalIndex;
         printf("%s", originalData[index]);
     }
