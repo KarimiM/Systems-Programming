@@ -21,6 +21,8 @@ int columnSize = 0;
 
 int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
 
+int arraySize = 2000;
+
 const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews", "duration", "director_facebook_likes", "actor_3_facebook_likes", "actor_2_name", "actor_1_facebook_likes", "gross", "genres", "actor_1_name", "movie_title", "num_voted_users", "cast_total_facebook_likes", "actor_3_name", "facenumber_in_poster", "plot_keywords", "movie_imdb_link", "num_user_for_reviews", "language", "country", "content_rating", "budget", "title_year", "actor_2_facebook_likes", "imdb_score", "aspect_ratio", "movie_facebook_likes" };
 
 int isNumeric = 0;
@@ -195,14 +197,14 @@ void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric){
 
 int main(int varc, char* argv[])
 {
-    char buffer[2500];
-    long int size = findSize("/Users/masoodkarimi/Documents/GitHub/Systems-Programming/CSV Sorter/CSV Sorter/movie_metadata.csv");
-    FILE* data = fopen("/Users/masoodkarimi/Documents/GitHub/Systems-Programming/CSV Sorter/CSV Sorter/movie_metadata.csv", "r");
     
-    
-    entries = malloc(size * 2);
-    fgets(buffer, 2500, data);
-    
+    entries = malloc(arraySize);
+    char *buffer = NULL;
+    size_t size;
+    if (getline(&buffer, &size, stdin) == -1) {
+        printf("No line\n");
+        return 0;
+    }
     int actualSize = getSize(buffer);
     char** cols = malloc(actualSize * 2);
     int currIndex = 0;
@@ -231,7 +233,7 @@ int main(int varc, char* argv[])
         }
     }
     int rows = 0;
-    while (fgets(buffer, 2500, data) != NULL)
+    while (getline(&buffer, &size, stdin) != -1)
     {
         int index = 0;
         actualSize = getSize(buffer);
@@ -247,6 +249,13 @@ int main(int varc, char* argv[])
             ind += tokSize + 1;
             tok = getFirstValue(buffer, ind);
             index++;
+        }
+        if (sizeof(entry.data) + sizeof(entries) > arraySize) {
+            arraySize *= 2;
+            csventry *adjustSize = malloc(arraySize);
+            memcpy(adjustSize, entries, arraySize / 2);
+            free(entries);
+            entries = adjustSize;
         }
         entries[rows].data = entry.data;
         //printf("Name: %s, rows: %s, Address: %p\n", entries[rows].data[1], entries[rows].data
