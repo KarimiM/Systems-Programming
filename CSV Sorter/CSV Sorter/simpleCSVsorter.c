@@ -235,7 +235,10 @@ int main(int varc, char* argv[])
         printf("No input\n");
         return 0;
     }
-    originalData[originalDataIndex++] = buffer;
+    int bufferSize = sizeof(buffer);
+    char *bufferCopy = malloc(bufferSize);
+    bufferCopy = memcpy(bufferCopy, buffer, bufferSize);
+    originalData[originalDataIndex++] = bufferCopy;
     int actualSize = getSize(buffer);
     char** cols = malloc(actualSize * 2);
     int currIndex = 0;
@@ -267,6 +270,9 @@ int main(int varc, char* argv[])
     int rows = 0;
     while (getline(&buffer, &size, stdin) != -1)
     {
+        int buffSize = sizeof(buffer);
+        char *buffCopy = malloc(buffSize);
+        memcpy(buffCopy, buffer, buffSize);
         if (originalDataIndex > originalDataArraySize) {
             originalDataArraySize *= 2;
             char** copy = malloc(originalDataArraySize);
@@ -274,7 +280,7 @@ int main(int varc, char* argv[])
             free(originalData);
             originalData = copy;
         }
-        originalData[originalDataIndex++] = buffer;
+        originalData[originalDataIndex++] = buffCopy;
         int index = 0;
         actualSize = getSize(buffer);
         csventry entry;
