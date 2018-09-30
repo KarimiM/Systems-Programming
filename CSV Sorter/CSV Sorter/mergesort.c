@@ -7,7 +7,7 @@
 //
 
 
-#include "simplerCSVsorter.h"
+#include "simpleCSVsorter.h"
 #include <time.h>
 #include <stdio.h>
 #include <string.h>

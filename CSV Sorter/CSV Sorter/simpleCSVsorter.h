@@ -13,6 +13,7 @@
 
 typedef struct csventry {
     char** data;
+    int originalIndex;
     
 } csventry;
 

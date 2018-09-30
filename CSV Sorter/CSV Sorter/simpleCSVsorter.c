@@ -1,3 +1,4 @@
+
 //
 //  simplerCSVsorter.c
 //  CSV Sorter
@@ -11,7 +12,13 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/stat.h>
-#include "simplerCSVsorter.h"
+#include "simpleCSVsorter.h"
+
+char** originalData;
+
+int originalDataArraySize = 2500;
+
+int originalDataIndex = 0;
 
 csventry *columns;
 csventry *entries;
@@ -30,14 +37,16 @@ const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews
 int isNumeric = 0;
 
 void checkNumeric(char *columnName) {
-    if (strcmp(columnName,"duration") == 0) {
-        isNumeric = 2;
+    if (strcmp(columnName,"duration") == 0 || strcmp(columnName, "movie_facebook_likes") == 0) {
+        isNumeric = 1;
         return;
     }
-    for (int i = 0; i < 28; i++) {
+    int i;
+    for (i = 0; i < 28; i++) {
         if (strcmp(columnName,columnTitles[i]) == 0) {
-            printf("I: %d\n", i);
-            for (int j = 0; j < 14; j++) {
+            
+            int j;
+            for (j = 0; j < 14; j++) {
                 if (columnNumericIds[j] == i) {
                     isNumeric = 1;
                 }
@@ -49,17 +58,15 @@ void checkNumeric(char *columnName) {
 
 int checkForColumn(char* check)
 {
-    int sortColumn = 0;
-    for(int i = 0; i < columnSize; i++){
-        if(i == columnSize - 1 && strcmp(columns->data[i],check) != 0){
-            return -1;
-        }
+    //printf("columns: %s", column->data[27]);
+    int i;
+    for(i = 0; i < columnSize; i++){
+        // printf("Column name: %s, index: %d, column size: %d\n", columns->data[i], i, columnSize);
         if(strcmp(columns->data[i],check) == 0){
-            sortColumn = i;
-            break;
+            return i;
         }
     }
-    return sortColumn;
+    return -1;
 }
 
 long int findSize(char file_name[])
@@ -86,7 +93,8 @@ long int findSize(char file_name[])
 int getSize(char *array)
 {
     int size = 0;
-    for (int i = 0; array[i] != '\0'; i++) {
+    int i;
+    for (i = 0; array[i] != '\0'; i++) {
         size++;
     }
     return size;
@@ -95,9 +103,17 @@ int getSize(char *array)
 char* getFirstValue(char* entry, int startIndex)
 {
     int endIndex = getSize(entry);
-    for (int i = startIndex; i < endIndex; i++)
+    int i;
+    for (i = startIndex; i <= endIndex - 1; i++)
     {
-        if (entry[i] == ',') {
+        if (i == endIndex - 2) {
+            char* value = malloc(i - startIndex);
+            memcpy(value, &entry[startIndex], i - startIndex);
+            value[i-startIndex] = '\0';
+            return value;
+            
+        }
+        if (entry[i] == ',' ) {
             char* value = malloc(i - startIndex + 1);
             if (i - startIndex == 0) {
                 value[0] = '\0';
@@ -124,7 +140,7 @@ int cmpInt(int firstInteger, int secondInteger){
 }
 
 //int cmpDateTime(DateTime firstDate, DateTime secondDate ){
-//	return 0;
+//  return 0;
 //}
 
 void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric){
@@ -197,16 +213,29 @@ void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric){
     }
 }
 
+void printCSV(csventry* entries, int rows, csventry* columnArr){
+    // printf("Printing to csv");
+    
+    printf("%s", originalData[0]);
+    int i;
+    for (i = 0; i < rows; i++) {
+        int index = entries[i].originalIndex;
+        printf("%s", originalData[index]);
+    }
+    //return 0;
+}
+
 int main(int varc, char* argv[])
 {
-    
+    originalData = malloc(originalDataArraySize * sizeof(char*));
     entries = malloc(arraySize);
     char *buffer = NULL;
     size_t size;
     if (getline(&buffer, &size, stdin) == -1) {
-        printf("No line\n");
+        printf("No input\n");
         return 0;
     }
+    originalData[originalDataIndex++] = buffer;
     int actualSize = getSize(buffer);
     char** cols = malloc(actualSize * 2);
     int currIndex = 0;
@@ -217,7 +246,7 @@ int main(int varc, char* argv[])
         token = getFirstValue(buffer, currIndex);
         columnSize++;
     }
-
+    
     columns = malloc(sizeof(cols));
     columns->data = cols;
     int columnId = checkForColumn(argv[2]);
@@ -226,8 +255,9 @@ int main(int varc, char* argv[])
         return 1;
     }
     checkNumeric(argv[2]);
-    printf("Column: %s, Column Id: %d, isNumeric: %d\n", argv[2], columnId, isNumeric);
-    for (int i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
+    // printf("Column: %s, Column Id: %d, isNumeric: %d\n", argv[2], columnId, isNumeric);
+    int i;
+    for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
         //replace whitespaces at end of certain column names
         char c = columns->data[columnSize - 1][i];
         if (c == 13 || c == 10) {
@@ -237,10 +267,19 @@ int main(int varc, char* argv[])
     int rows = 0;
     while (getline(&buffer, &size, stdin) != -1)
     {
+        if (originalDataIndex > originalDataArraySize) {
+            originalDataArraySize *= 2;
+            char** copy = malloc(originalDataArraySize);
+            memcpy(copy, originalData, originalDataArraySize / 2);
+            free(originalData);
+            originalData = copy;
+        }
+        originalData[originalDataIndex++] = buffer;
         int index = 0;
         actualSize = getSize(buffer);
         csventry entry;
         entry.data = malloc(actualSize * 2);
+        entry.originalIndex = rows + 1;
         currSize += actualSize * 2;
         int ind = 0;
         char* tok = getFirstValue(buffer, ind);
@@ -262,20 +301,26 @@ int main(int varc, char* argv[])
         }
         entries[rows].data = entry.data;
         //printf("Name: %s, rows: %s, Address: %p\n", entries[rows].data[1], entries[rows].data
-               //[2], &entries[rows]);
+        //[2], &entries[rows]);
         rows++;
     }
     
-    for (int i = 0; i < rows; i++) {
-        printf("Facebook likes: %s\n", entries[i].data[columnId]);
+    for (i = 0; i < rows; i++) {
+        //printf("Facebook likes: %s\n", entries[i].data[columnId]);
     }
     mergesorts(entries, 0, rows - 1, columnId, isNumeric);
-    printf("------------\n");
-    for (int i = 0; i < rows; i++) {
-        printf("Facebook likes: %s\n", entries[i].data[columnId]);
+    
+    for (i = 0; i < rows; i++) {
+        // printf("Facebook likes: %s\n", entries[i].data[columnId]);
     }
+    
+    printCSV(entries, rows, columns);
+    
     free(cols);
     free(columns);
+    free(entries);
+    free(originalData);
+    free(buffer);
     return 0;
     
 }

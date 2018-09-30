@@ -7,9 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		03319C85215960930035FC59 /* simplerCSVsorter.c in Sources */ = {isa = PBXBuildFile; fileRef = 03319C83215960930035FC59 /* simplerCSVsorter.c */; };
+		03319C85215960930035FC59 /* simpleCSVsorter.c in Sources */ = {isa = PBXBuildFile; fileRef = 03319C83215960930035FC59 /* simpleCSVsorter.c */; };
 		03319C87215960AE0035FC59 /* mergesort.c in Sources */ = {isa = PBXBuildFile; fileRef = 03319C86215960AE0035FC59 /* mergesort.c */; };
-		03CDD123216164AF0045A9FE /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = 03CDD122216164AF0045A9FE /* test.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,10 +25,9 @@
 
 /* Begin PBXFileReference section */
 		03319C7921595F0E0035FC59 /* CSV Sorter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "CSV Sorter"; sourceTree = BUILT_PRODUCTS_DIR; };
-		03319C83215960930035FC59 /* simplerCSVsorter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simplerCSVsorter.c; sourceTree = "<group>"; };
-		03319C84215960930035FC59 /* simplerCSVsorter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simplerCSVsorter.h; sourceTree = "<group>"; };
+		03319C83215960930035FC59 /* simpleCSVsorter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simpleCSVsorter.c; sourceTree = "<group>"; };
+		03319C84215960930035FC59 /* simpleCSVsorter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simpleCSVsorter.h; sourceTree = "<group>"; };
 		03319C86215960AE0035FC59 /* mergesort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mergesort.c; sourceTree = "<group>"; };
-		03CDD122216164AF0045A9FE /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,10 +60,9 @@
 		03319C7B21595F0E0035FC59 /* CSV Sorter */ = {
 			isa = PBXGroup;
 			children = (
-				03319C83215960930035FC59 /* simplerCSVsorter.c */,
-				03319C84215960930035FC59 /* simplerCSVsorter.h */,
+				03319C83215960930035FC59 /* simpleCSVsorter.c */,
+				03319C84215960930035FC59 /* simpleCSVsorter.h */,
 				03319C86215960AE0035FC59 /* mergesort.c */,
-				03CDD122216164AF0045A9FE /* test.c */,
 			);
 			path = "CSV Sorter";
 			sourceTree = "<group>";
@@ -127,9 +124,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03CDD123216164AF0045A9FE /* test.c in Sources */,
 				03319C87215960AE0035FC59 /* mergesort.c in Sources */,
-				03319C85215960930035FC59 /* simplerCSVsorter.c in Sources */,
+				03319C85215960930035FC59 /* simpleCSVsorter.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
