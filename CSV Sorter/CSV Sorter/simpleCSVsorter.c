@@ -58,10 +58,8 @@ void checkNumeric(char *columnName) {
 
 int checkForColumn(char* check)
 {
-    //printf("columns: %s", column->data[27]);
     int i;
     for(i = 0; i < columnSize; i++){
-       // printf("Column name: %s, index: %d, column size: %d\n", columns->data[i], i, columnSize);
         if(strcmp(columns->data[i],check) == 0){
             return i;
         }
@@ -69,22 +67,13 @@ int checkForColumn(char* check)
     return -1;
 }
 
-//int cmpDateTime(DateTime firstDate, DateTime secondDate ){
-//  return 0;
-//}
-
-
-
- void printCSV(csventry* entries, int rows, csventry* columnArr){
-   // printf("Printing to csv");
-    
+void printCSV(csventry* entries, int rows, csventry* columnArr){
     printf("%s", originalData[0]);
     int i;
     for (i = 0; i < rows; i++) {
         int index = entries[i].originalIndex;
         printf("%s", originalData[index + 1]);
     }
-    //return 0;
 }
 
 int main(int varc, char* argv[])
@@ -118,7 +107,6 @@ int main(int varc, char* argv[])
         return 1;
     }
     checkNumeric(argv[2]);
-   // printf("Column: %s, Column Id: %d, isNumeric: %d\n", argv[2], columnId, isNumeric);
     int i;
     for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
         //replace whitespaces at end of certain column names
@@ -162,17 +150,10 @@ int main(int varc, char* argv[])
         }
         entries[rows].data = entry.data;
         entries[rows].originalIndex = rows;
-        //printf("Name: %s, rows: %s, Address: %p\n", entries[rows].data[1], entries[rows].data
-              // [2], &entries[rows]);
         rows++;
     }
     mergesorts(entries, 0, rows - 1, columnId, isNumeric);
-    for (i = 0; i < rows; i++) {
-       // printf("Facebook likes: %s\n", entries[i].data[columnId]);
-    }
-
     printCSV(entries, rows, columns);
-
     free(cols);
     free(columns);
     free(entries);
