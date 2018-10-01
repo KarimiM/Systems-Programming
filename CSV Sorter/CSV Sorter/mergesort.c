@@ -21,8 +21,8 @@ void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeri
     int leftSize = mid - low + 1;
     int rightSize = high - mid;
     
-    csventry left[n1];
-    csventry right[n2];
+    csventry left[leftSize];
+    csventry right[rightSize];
     
     for (i = 0; i < leftSize; i++) {
         csventry check = entryArr[low + i];
