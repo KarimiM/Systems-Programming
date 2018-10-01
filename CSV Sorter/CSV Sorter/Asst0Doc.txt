@@ -1,5 +1,13 @@
 Partners: Stephen Quickel- svq3  Masood Karimi- mkk102
 
+To compile:
+gcc simpleCSVsorter.c -o simpleCSVsorter
+
+To run:
+cat movie_metadata.csv |./simpleCSVsorter -c movie_title  > out.csv 
+
+
+
 Structs:
   typedef struct csventry:
     Has a char** data and a int originalIndex.  The double char array represents one row of data or 
