@@ -107,13 +107,17 @@ int main(int varc, char* argv[])
         return 1;
     }
     checkNumeric(argv[2]);
-    int i;
-    for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
+    int a;
+    for (a = 0; a < columnSize; a++) {
+    int i, j;
+    for (i = 0; i < getSize(columns->data[a]); i++) {
         //replace whitespaces at end of certain column names
-        char c = columns->data[columnSize - 1][i];
-        if (c == 13 || c == 10) {
-            columns->data[columnSize - 1][i] = '\0';
+        char c = columns->data[a][i];
+        if (c != 13 && c != 10) {
+            columns->data[a][j++] = c;
         }
+    }
+        columns->data[a][j] = '\0';
     }
     int rows = 0;
     while (getline(&buffer, &size, stdin) != -1)
