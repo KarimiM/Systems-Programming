@@ -14,21 +14,20 @@
 #include <sys/stat.h>
 #include "simpleCSVsorter.h"
 
-char** originalData;
-
-int originalDataArraySize = 2500;
-
-int originalDataIndex = 0;
-
 csventry *columns;
 csventry *entries;
 
+char** originalData;
+
+int dataSize = 1000;
+
+int dataIndex = 0;
 
 int columnSize = 0;
 
 int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
 
-int arraySize = 2000;
+int arraySize = 1000;
 
 int currSize = 0;
 
@@ -44,7 +43,7 @@ void checkNumeric(char *columnName) {
     int i;
     for (i = 0; i < 28; i++) {
         if (strcmp(columnName,columnTitles[i]) == 0) {
-            
+        
             int j;
             for (j = 0; j < 14; j++) {
                 if (columnNumericIds[j] == i) {
@@ -61,7 +60,7 @@ int checkForColumn(char* check)
     //printf("columns: %s", column->data[27]);
     int i;
     for(i = 0; i < columnSize; i++){
-        // printf("Column name: %s, index: %d, column size: %d\n", columns->data[i], i, columnSize);
+       // printf("Column name: %s, index: %d, column size: %d\n", columns->data[i], i, columnSize);
         if(strcmp(columns->data[i],check) == 0){
             return i;
         }
@@ -111,7 +110,7 @@ char* getFirstValue(char* entry, int startIndex)
             memcpy(value, &entry[startIndex], i - startIndex);
             value[i-startIndex] = '\0';
             return value;
-            
+
         }
         if (entry[i] == ',' ) {
             char* value = malloc(i - startIndex + 1);
@@ -155,12 +154,14 @@ void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeri
         csventry check = entryArr[low + i];
         //L[i].data = malloc(sizeof(check.data));
         L[i].data = check.data;
+        L[i].originalIndex = check.originalIndex;
     }
     
     for (j = 0; j < n2; j++) {
         csventry check = entryArr[mid + 1 + j];
         //R[j].data = malloc(sizeof(check.data));
         R[j].data = check.data;
+        R[j].originalIndex = check.originalIndex;
     }
     
     i=0;
@@ -213,20 +214,21 @@ void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric){
     }
 }
 
-void printCSV(csventry* entries, int rows, csventry* columnArr){
-    // printf("Printing to csv");
+ void printCSV(csventry* entries, int rows, csventry* columnArr){
+   // printf("Printing to csv");
     
+    printf("%s", originalData[0]);
     int i;
-    for (i = 0; i < rows + 1; i++) {
+    for (i = 0; i < rows; i++) {
         int index = entries[i].originalIndex;
-        printf("%s", originalData[index]);
+        printf("%s", originalData[index + 1]);
     }
     //return 0;
 }
 
 int main(int varc, char* argv[])
 {
-    originalData = malloc(originalDataArraySize * sizeof(char*));
+    originalData = malloc(dataSize * sizeof(char*));
     entries = malloc(arraySize);
     char *buffer = NULL;
     size_t size;
@@ -234,10 +236,6 @@ int main(int varc, char* argv[])
         printf("No input\n");
         return 0;
     }
-    int bufferSize = sizeof(buffer);
-    char *bufferCopy = malloc(bufferSize);
-    bufferCopy = memcpy(bufferCopy, buffer, bufferSize);
-    originalData[originalDataIndex++] = bufferCopy;
     int actualSize = getSize(buffer);
     char** cols = malloc(actualSize * 2);
     int currIndex = 0;
@@ -248,7 +246,9 @@ int main(int varc, char* argv[])
         token = getFirstValue(buffer, currIndex);
         columnSize++;
     }
-    
+    char* bufferCopy = malloc(size);
+    strncpy(bufferCopy, buffer, size);
+    originalData[dataIndex++] = bufferCopy;
     columns = malloc(sizeof(cols));
     columns->data = cols;
     int columnId = checkForColumn(argv[2]);
@@ -257,7 +257,7 @@ int main(int varc, char* argv[])
         return 1;
     }
     checkNumeric(argv[2]);
-    // printf("Column: %s, Column Id: %d, isNumeric: %d\n", argv[2], columnId, isNumeric);
+   // printf("Column: %s, Column Id: %d, isNumeric: %d\n", argv[2], columnId, isNumeric);
     int i;
     for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
         //replace whitespaces at end of certain column names
@@ -269,22 +269,18 @@ int main(int varc, char* argv[])
     int rows = 0;
     while (getline(&buffer, &size, stdin) != -1)
     {
-        int buffSize = sizeof(buffer);
-        char *buffCopy = malloc(buffSize);
-        memcpy(buffCopy, buffer, buffSize);
-        if (originalDataIndex > originalDataArraySize) {
-            originalDataArraySize *= 2;
-            char** copy = malloc(originalDataArraySize);
-            memcpy(copy, originalData, originalDataArraySize / 2);
-            free(originalData);
-            originalData = copy;
+        char* buffCopy = malloc(size);
+        strncpy(buffCopy, buffer, size);
+        if (dataIndex >= dataSize - 100) {
+            puts("reallocing");
+            dataSize *= 2;
+            originalData = realloc(originalData, dataSize * sizeof(char*));
         }
-        originalData[originalDataIndex++] = buffCopy;
+        originalData[dataIndex++] = buffCopy;
         int index = 0;
         actualSize = getSize(buffer);
         csventry entry;
         entry.data = malloc(actualSize * 2);
-        entry.originalIndex = rows + 1;
         currSize += actualSize * 2;
         int ind = 0;
         char* tok = getFirstValue(buffer, ind);
@@ -305,27 +301,21 @@ int main(int varc, char* argv[])
             entries = adjustSize;
         }
         entries[rows].data = entry.data;
+        entries[rows].originalIndex = rows;
         //printf("Name: %s, rows: %s, Address: %p\n", entries[rows].data[1], entries[rows].data
-        //[2], &entries[rows]);
+              // [2], &entries[rows]);
         rows++;
     }
-    
-    for (i = 0; i < rows; i++) {
-        //printf("Facebook likes: %s\n", entries[i].data[columnId]);
-    }
     mergesorts(entries, 0, rows - 1, columnId, isNumeric);
-    
     for (i = 0; i < rows; i++) {
-        // printf("Facebook likes: %s\n", entries[i].data[columnId]);
+       // printf("Facebook likes: %s\n", entries[i].data[columnId]);
     }
-    
+
     printCSV(entries, rows, columns);
-    
+
     free(cols);
     free(columns);
     free(entries);
-    free(originalData);
-    free(buffer);
     return 0;
     
 }
