@@ -18,62 +18,62 @@ int cmpInt(int firstInteger, int secondInteger){
 
 void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric){
     int i, j, k;
-    int n1 = mid - low + 1;
-    int n2 = high - mid;
+    int leftSize = mid - low + 1;
+    int rightSize = high - mid;
     
-    csventry L[n1];
-    csventry R[n2];
+    csventry left[n1];
+    csventry right[n2];
     
-    for (i = 0; i < n1; i++) {
+    for (i = 0; i < leftSize; i++) {
         csventry check = entryArr[low + i];
         //L[i].data = malloc(sizeof(check.data));
-        L[i].data = check.data;
-        L[i].originalIndex = check.originalIndex;
+        left[i].data = check.data;
+        left[i].originalIndex = check.originalIndex;
     }
     
-    for (j = 0; j < n2; j++) {
+    for (j = 0; j < rightSize; j++) {
         csventry check = entryArr[mid + 1 + j];
         //R[j].data = malloc(sizeof(check.data));
-        R[j].data = check.data;
-        R[j].originalIndex = check.originalIndex;
+        right[j].data = check.data;
+        right[j].originalIndex = check.originalIndex;
     }
     
     i=0;
     j=0;
     k=low;
-    while (i < n1 && j < n2) {
+    while (i < leftSize && j < rightSize) {
         if(numeric == 1){
-            int one = atoi(L[i].data[colID]);
-            int two = atoi(R[j].data[colID]);
+            int one = atoi(left[i].data[colID]);
+            int two = atoi(right[j].data[colID]);
             if (one <= two) {
-                entryArr[k] = L[i];
+                entryArr[k] = left[i];
                 i++;
             } else {
-                entryArr[k] = R[j];
+                entryArr[k] = right[j];
                 j++;
             }
         }
         else if(numeric == 0){
-            char* one = L[i].data[colID];
-            char* two = R[j].data[colID];
+            char* one = left[i].data[colID];
+            char* two = right[j].data[colID];
             if(cmpString(one, two) == 1){
-                entryArr[k] = L[i];
+                entryArr[k] = left[i];
                 i++;
             }
             else{
-                entryArr[k] = R[j];
+                entryArr[k] = right[j];
                 j++;
             }
         }
         k++;
     }
-    while (i < n1) {
-        entryArr[k] = L[i];
+    while (i < leftSize) {
+        entryArr[k] = left[i];
         i++;
         k++;
     }
-    while (j < n2) {
-        entryArr[k] = R[j];
+    while (j < rightSize) {
+        entryArr[k] = right[j];
         j++;
         k++;
     }

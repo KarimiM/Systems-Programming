@@ -19,6 +19,16 @@ typedef struct csventry {
 
 
 
+int getSize(char *array)
+{
+    int size = 0;
+    int i;
+    for (i = 0; array[i] != '\0'; i++) {
+        size++;
+    }
+    return size;
+}
+
 char* getFirstValue(char* entry, int startIndex)
 {
     int endIndex = getSize(entry);
