@@ -1,0 +1,57 @@
+Partners: Stephen Quickel- svq3  Masood Karimi- mkk102
+
+Structs:
+  typedef struct csventry:
+    Has a char** data and a int originalIndex.  The double char array represents one row of data or 
+    one film in the list.  So one array is to represent each column and the other char array holds 
+    the actual string contained within that column.  The originalIndex stores the original location
+    of that film in the given csv, which is parsed by the line, so as to be able to copy that exact 
+    line when printing at the end without any errors.
+
+Functions:
+  void checkNumeric(char* columnName);
+    This method is to be able to take in the identifier for a column such as director name and determine from the given 
+    list if its numeric will be will be a 0 (a char array) or 1 (is and integer) to give an indication of how it 
+    should be sorted.
+    
+  int checkForColumn(char* check);
+    Takes a string and checks through parsed columns if it is in the list of fields currently in use 
+    in the columns field else the inputed arg would be an error.
+    
+  int getSize(char *array);
+    Gets size of char array by checking for a null terminator
+
+  char* getFirstValue(char* entry, int startIndex);
+    
+  
+  void printCSV(csventry* entries, int rows, csventry* columnArr);
+    Prints out the string based on the original lines rows using an indexing system which is preserved throughout the
+    mergesort process so the format will be the exact same as the original and will be printed to the stdout.
+  
+  int main(int varc, char* argv[]);
+MergeSort Implementation:
+  int cmpString(char* str1, char* str2);
+    Compares two strings or char* based on how strcmp determines if str1 <= str2.
+  
+  int cmpInt(int firstInteger, int secondInteger);
+    Compares two integers within the mergesort method and returns 1 if str1 is less than or equal to string two
+  
+  void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric);
+  
+  void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric);
+    Starts with the array of csventry's and the low(0), high(length of the array), and we needed the
+    columnID for printing the original format at the end as well as if the given field was numeric or
+    not which was determined earlier.  The numeric will allow merge to determine the way the field 
+    will be sorted.  Then using recursion this funtion will recursivly split the full array in half
+    until only single csv entries remain and the merge at the bottom will go through this parsed array 
+    switching entries that need to be reversed and keeping entries that are in the correct spot until
+    only the final sorted array remains.
+
+Predicted Run time: 
+
+  Given that all the reads and print statement to the CSV file would be O(1) merge sort would be the defining funtion for this programs
+  which would be O(nlogn).
+  
+Assumptions:
+  Based on a Piazza post answered by the instructor it said to base all string sorting on how strcmp would judge all comparisons such as   some titles with quotes around titles may appear first based on strcmp function.
+
