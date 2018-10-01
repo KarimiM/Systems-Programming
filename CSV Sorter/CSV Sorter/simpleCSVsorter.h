@@ -17,6 +17,35 @@ typedef struct csventry {
     
 } csventry;
 
+
+
+char* getFirstValue(char* entry, int startIndex)
+{
+    int endIndex = getSize(entry);
+    int i;
+    for (i = startIndex; i <= endIndex - 1; i++)
+    {
+        if (i == endIndex - 2) {
+            char* value = malloc(i - startIndex);
+            memcpy(value, &entry[startIndex], i - startIndex);
+            value[i-startIndex] = '\0';
+            return value;
+            
+        }
+        if (entry[i] == ',' ) {
+            char* value = malloc(i - startIndex + 1);
+            if (i - startIndex == 0) {
+                value[0] = '\0';
+                return value;
+            }
+            memcpy(value, &entry[startIndex], i - startIndex);
+            value[i-startIndex] = '\0';
+            return value;
+        }
+    }
+    return NULL;
+}
+
 //#include "mergesort.c"
 //int cmpInt(int firstInteger, int secondInteger);
 //int cmpString(char* str1, char* str2);

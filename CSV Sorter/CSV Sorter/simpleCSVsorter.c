@@ -69,81 +69,9 @@ int checkForColumn(char* check)
     return -1;
 }
 
-long int findSize(char file_name[])
-{
-    // opening the file in read mode
-    FILE* fp = fopen(file_name, "r");
-    
-    // checking if the file exist or not
-    if (fp == NULL) {
-        printf("File Not Found!\n");
-        return -1;
-    }
-    
-    fseek(fp, 0L, SEEK_END);
-    
-    // calculating the size of the file
-    long int res = ftell(fp);
-    
-    // closing the file
-    fclose(fp);
-    
-    return res;
-}
-int getSize(char *array)
-{
-    int size = 0;
-    int i;
-    for (i = 0; array[i] != '\0'; i++) {
-        size++;
-    }
-    return size;
-}
-
-char* getFirstValue(char* entry, int startIndex)
-{
-    int endIndex = getSize(entry);
-    int i;
-    for (i = startIndex; i <= endIndex - 1; i++)
-    {
-        if (i == endIndex - 2) {
-            char* value = malloc(i - startIndex);
-            memcpy(value, &entry[startIndex], i - startIndex);
-            value[i-startIndex] = '\0';
-            return value;
-
-        }
-        if (entry[i] == ',' ) {
-            char* value = malloc(i - startIndex + 1);
-            if (i - startIndex == 0) {
-                value[0] = '\0';
-                return value;
-            }
-            memcpy(value, &entry[startIndex], i - startIndex);
-            value[i-startIndex] = '\0';
-            return value;
-        }
-    }
-    return NULL;
-}
-
-int cmpString(char* str1, char* str2){
-    int result = strcmp(str1, str2);
-    if(result <= 0) return 1;
-    else return 0;
-}
-
-int cmpInt(int firstInteger, int secondInteger){
-    
-    if(firstInteger <= secondInteger) return 1;
-    else return 0;
-}
-
 //int cmpDateTime(DateTime firstDate, DateTime secondDate ){
 //  return 0;
 //}
-
-
 
 
 

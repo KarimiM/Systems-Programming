@@ -1,7 +1,20 @@
-//#include <stdio.h>
-//#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "simpleCSVsorter.h"
 //#include <string.h>
 
+
+int cmpString(char* str1, char* str2){
+    int result = strcmp(str1, str2);
+    if(result <= 0) return 1;
+    else return 0;
+}
+
+int cmpInt(int firstInteger, int secondInteger){
+    
+    if(firstInteger <= secondInteger) return 1;
+    else return 0;
+}
 
 void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric){
     int i, j, k;
