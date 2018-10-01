@@ -108,7 +108,7 @@ int main(int varc, char* argv[])
     }
     checkNumeric(argv[2]);
     int a;
-    for (a = 0; a < columnSize; a++) {
+    for (a = 0; a < 15; a++) {
     int i, j;
     for (i = 0; i < getSize(columns->data[a]); i++) {
         //replace whitespaces at end of certain column names
