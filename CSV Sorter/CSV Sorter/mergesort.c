@@ -1,77 +1,77 @@
-//
-//  mergesort.c
-//  CSV Sorter
-//
-//  Created by Masood Karimi on 9/24/18.
-//  Copyright © 2018 Masood Karimi. All rights reserved.
-//
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 
 
-#include "simpleCSVsorter.h"
-#include <time.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric){
+    int i, j, k;
+    int n1 = mid - low + 1;
+    int n2 = high - mid;
+    
+    csventry L[n1];
+    csventry R[n2];
+    
+    for (i = 0; i < n1; i++) {
+        csventry check = entryArr[low + i];
+        //L[i].data = malloc(sizeof(check.data));
+        L[i].data = check.data;
+        L[i].originalIndex = check.originalIndex;
+    }
+    
+    for (j = 0; j < n2; j++) {
+        csventry check = entryArr[mid + 1 + j];
+        //R[j].data = malloc(sizeof(check.data));
+        R[j].data = check.data;
+        R[j].originalIndex = check.originalIndex;
+    }
+    
+    i=0;
+    j=0;
+    k=low;
+    while (i < n1 && j < n2) {
+        if(numeric == 1){
+            int one = atoi(L[i].data[colID]);
+            int two = atoi(R[j].data[colID]);
+            if (one <= two) {
+                entryArr[k] = L[i];
+                i++;
+            } else {
+                entryArr[k] = R[j];
+                j++;
+            }
+        }
+        else if(numeric == 0){
+            char* one = L[i].data[colID];
+            char* two = R[j].data[colID];
+            if(cmpString(one, two) == 1){
+                entryArr[k] = L[i];
+                i++;
+            }
+            else{
+                entryArr[k] = R[j];
+                j++;
+            }
+        }
+        k++;
+    }
+    while (i < n1) {
+        entryArr[k] = L[i];
+        i++;
+        k++;
+    }
+    while (j < n2) {
+        entryArr[k] = R[j];
+        j++;
+        k++;
+    }
+}
 
 
-
-//int cmpString(char* str1, char* str2){
-//	int result = strcmp(str1, str2);
-//	if(result <= 0) return 1;
-//	else return 0;
-//}
-//
-//int cmpInt(int firstInteger, int secondInteger){
-//	
-//	if(firstInteger <= secondInteger) return 1;
-//	else return 0;
-//}
-//
-////int cmpDateTime(DateTime firstDate, DateTime secondDate ){
-////	return 0;
-////}
-//
-//void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric){
-//	csventry* mergeArr = malloc(sizeof(entryArr));
-//	int x = low;
-//	int y = mid + 1;
-//	int z = 0;
-//
-//	while(x <= mid && y <= high) {
-//		if(numeric == 1){  //numeric
-//			if(cmpInt(atoi(entryArr[x].data[colID]), atoi(entryArr[y].data[colID])) == 1){
-//				mergeArr[z++] = entryArr[x++];
-//			}
-//			else mergeArr[z++] = entryArr[y++];
-//		}
-//		else if(numeric == 0){  //string
-//			if(cmpString(entryArr[x].data[colID], entryArr[y].data[colID])== 1){
-//				mergeArr[z++] = entryArr[x++]; 
-//			}
-//			else mergeArr[z++] = entryArr[y++];
-//		}
-//		else{
-//			return;
-//		}
-//		while(x <= mid){
-//			mergeArr[z++] = entryArr[x++];
-//		}
-//		while(y <= high){
-//			mergeArr[z++] = entryArr[y++];
-//		}
-//		while(z >= 0){
-//			entryArr[low + z] = mergeArr[z];
-//			z = z-1;
-//		}
-//	}
-//}
-//
-//void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric){
-//	if(low<high){
-//		int mid = (high+low)/2;
-//		mergesorts(entryArr, low, mid, colID, numeric);
-//		mergesorts(entryArr, mid+1, high, colID, numeric);
-//		merge(entryArr, low, mid, high, colID, numeric);
-//	}
-//
-//}
+void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric){
+    if(low<high){
+        int mid = (high+low)/2;
+        mergesorts(entryArr, low, mid, colID, numeric);
+        mergesorts(entryArr, mid+1, high, colID, numeric);
+        merge(entryArr, low, mid, high, colID, numeric);
+    }
+}
