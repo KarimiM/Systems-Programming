@@ -20,9 +20,9 @@ const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews
 
 const int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
 
-void checkNumeric(char *columnName, int isNumeric) {
+void checkNumeric(char *columnName, int * isNumeric) {
     if (strcmp(columnName,"duration") == 0 || strcmp(columnName, "movie_facebook_likes") == 0) {
-        isNumeric = 1;
+        *isNumeric = 1;
         return;
     }
     int i;
@@ -32,7 +32,7 @@ void checkNumeric(char *columnName, int isNumeric) {
             int j;
             for (j = 0; j < 14; j++) {
                 if (columnNumericIds[j] == i) {
-                    isNumeric = 1;
+                    *isNumeric = 1;
                 }
             }
             break;
@@ -43,8 +43,18 @@ void checkNumeric(char *columnName, int isNumeric) {
 int checkForColumn(char* check, int columnSize, csventry *columns)
 {
     int i;
+    int exists = 0;
+    for (i = 0; i < 28; i++) {
+        if (strcmp(check, columnTitles[i]) == 0) {
+           exists = 1;
+           break;
+        }
+    }
+    if (exists == 0) {
+       return -1;
+    }
     for(i = 0; i < columnSize; i++){
-	printf("%s\n", columns->data[i]);
+	printf("%s\n", columns->data[i], check);
         if(strcmp(columns->data[i],check) == 0){
             return i;
         }
@@ -84,7 +94,7 @@ int main(int varc, char* argv[])
     
     int currSize = 0;
     
-    int isNumeric = 0;
+    int * isNumeric = calloc(1, sizeof(int*));
     
     originalData = malloc(dataSize * sizeof(char*));
     entries = malloc(arraySize);
@@ -172,6 +182,7 @@ int main(int varc, char* argv[])
     free(cols);
     free(columns);
     free(entries);
+    free(isNumeric);
     return 0;
     
 }

@@ -39,7 +39,7 @@ int cmpInt(int firstInteger, int secondInteger){
     else return 0;
 }
 
-void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric){
+void merge(csventry* entryArr, int low, int mid, int high, int colID, int *numeric){
     int i, j, k;
     int leftSize = mid - low + 1;
     int rightSize = high - mid;
@@ -65,7 +65,7 @@ void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeri
     j=0;
     k=low;
     while (i < leftSize && j < rightSize) {
-        if(numeric == 1){
+        if(*numeric == 1){
             int one = atoi(left[i].data[colID]);
             int two = atoi(right[j].data[colID]);
             if (one <= two) {
@@ -76,7 +76,7 @@ void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeri
                 j++;
             }
         }
-        else if(numeric == 0){
+        else if(*numeric == 0){
             char* one = left[i].data[colID];
             char* two = right[j].data[colID];
             if(cmpString(one, two) == 1){
@@ -103,7 +103,7 @@ void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeri
 }
 
 
-void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric){
+void mergesorts(csventry* entryArr, int low, int high, int colID, int * numeric){
     if(low<high){
         int mid = (high+low)/2;
         mergesorts(entryArr, low, mid, colID, numeric);
