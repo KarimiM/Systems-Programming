@@ -60,6 +60,7 @@ int checkForColumn(char* check)
 {
     int i;
     for(i = 0; i < columnSize; i++){
+	printf("%s\n", columns->data[i]);
         if(strcmp(columns->data[i],check) == 0){
             return i;
         }
@@ -78,7 +79,7 @@ void printCSV(csventry* entries, int rows, csventry* columnArr){
 
 int main(int varc, char* argv[])
 {
-    if (varc !=2 || strcmp(argv[1], "-c") != 0 ) {
+    if (varc !=3 || strcmp(argv[1], "-c") != 0 ) {
         printf("ERROR: Incorrect Arguments, 2 arguments required. Usage: -c *column name you wish to be sorted*.\n");
         exit(1);
     }

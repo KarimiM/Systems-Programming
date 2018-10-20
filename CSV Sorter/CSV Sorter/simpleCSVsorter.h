@@ -35,13 +35,13 @@ char* getFirstValue(char* entry, int startIndex)
     int i;
     for (i = startIndex; i <= endIndex - 1; i++)
     {
-//        if (i == endIndex - 2) {
-//            char* value = malloc(i - startIndex);
-//            memcpy(value, &entry[startIndex], i - startIndex);
-//            value[i-startIndex] = '\0';
-//            return value;
-//            
-//        }
+        if (i == endIndex - 1) {
+            char* value = malloc(i - startIndex);
+            memcpy(value, &entry[startIndex], i - startIndex);
+            value[i-startIndex] = '\0';
+            return value;
+            
+        }
         if (entry[i] == ',' ) {
             char* value = malloc(i - startIndex + 1);
             if (i - startIndex == 0) {
@@ -53,10 +53,7 @@ char* getFirstValue(char* entry, int startIndex)
             return value;
         }
     }
-    char* value = malloc(endIndex - startIndex);
-    memcpy(value, &entry[startIndex], i - startIndex);
-    value[endIndex-startIndex] = '\0';
-    return value;
+    return NULL;
 }
 
 //#include "mergesort.c"
