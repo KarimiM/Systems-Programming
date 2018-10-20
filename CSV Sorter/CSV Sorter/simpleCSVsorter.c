@@ -80,7 +80,7 @@ int main(int varc, char* argv[])
 {
     if (varc !=2 || strcmp(argv[1], "-c") != 0 ) {
         printf("ERROR: Incorrect Arguments, 2 arguments required. Usage: -c *column name you wish to be sorted*.\n");
-	exit(1);
+        exit(1);
     }
     originalData = malloc(dataSize * sizeof(char*));
     entries = malloc(arraySize);
