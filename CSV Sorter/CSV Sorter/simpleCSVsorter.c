@@ -54,7 +54,6 @@ int checkForColumn(char* check, int columnSize, csventry *columns)
        return -1;
     }
     for(i = 0; i < columnSize; i++){
-	printf("%s\n", columns->data[i], check);
         if(strcmp(columns->data[i],check) == 0){
             return i;
         }
