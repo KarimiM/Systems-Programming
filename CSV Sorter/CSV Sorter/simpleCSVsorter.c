@@ -15,28 +15,12 @@
 #include "simpleCSVsorter.h"
 #include "mergesort.c"
 
-csventry *columns;
-csventry *entries;
-
-char** originalData;
-
-int dataSize = 1000;
-
-int dataIndex = 0;
-
-int columnSize = 0;
-
-int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
-
-int arraySize = 1000;
-
-int currSize = 0;
-
 const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews", "duration", "director_facebook_likes", "actor_3_facebook_likes", "actor_2_name", "actor_1_facebook_likes", "gross", "genres", "actor_1_name", "movie_title", "num_voted_users", "cast_total_facebook_likes", "actor_3_name", "facenumber_in_poster", "plot_keywords", "movie_imdb_link", "num_user_for_reviews", "language", "country", "content_rating", "budget", "title_year", "actor_2_facebook_likes", "imdb_score", "aspect_ratio", "movie_facebook_likes" };
 
-int isNumeric = 0;
 
-void checkNumeric(char *columnName) {
+const int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
+
+void checkNumeric(char *columnName, int isNumeric) {
     if (strcmp(columnName,"duration") == 0 || strcmp(columnName, "movie_facebook_likes") == 0) {
         isNumeric = 1;
         return;
@@ -56,7 +40,7 @@ void checkNumeric(char *columnName) {
     }
 }
 
-int checkForColumn(char* check)
+int checkForColumn(char* check, int columnSize, csventry *columns)
 {
     int i;
     for(i = 0; i < columnSize; i++){
@@ -68,7 +52,7 @@ int checkForColumn(char* check)
     return -1;
 }
 
-void printCSV(csventry* entries, int rows, csventry* columnArr){
+void printCSV(csventry* entries, int rows, csventry* columnArr, char** originalData){
     printf("%s", originalData[0]);
     int i;
     for (i = 0; i < rows; i++) {
@@ -83,6 +67,25 @@ int main(int varc, char* argv[])
         printf("ERROR: Incorrect Arguments, 2 arguments required. Usage: -c *column name you wish to be sorted*.\n");
         exit(1);
     }
+    
+    csventry *columns;
+    
+    csventry *entries;
+    
+    char** originalData;
+    
+    int dataSize = 1000;
+    
+    int dataIndex = 0;
+    
+    int columnSize = 0;
+    
+    int arraySize = 1000;
+    
+    int currSize = 0;
+    
+    int isNumeric = 0;
+    
     originalData = malloc(dataSize * sizeof(char*));
     entries = malloc(arraySize);
     char *buffer = NULL;
@@ -106,12 +109,12 @@ int main(int varc, char* argv[])
     originalData[dataIndex++] = bufferCopy;
     columns = malloc(sizeof(cols));
     columns->data = cols;
-    int columnId = checkForColumn(argv[2]);
+    int columnId = checkForColumn(argv[2], columnSize, columns);
     if (columnId == -1) {
         printf("ERROR: Column in argument does not exist.");
         return 1;
     }
-    checkNumeric(argv[2]);
+    checkNumeric(argv[2], isNumeric);
     int i;
     for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
         //replace whitespaces at end of certain column names
@@ -165,7 +168,7 @@ int main(int varc, char* argv[])
         rows++;
     }
     mergesorts(entries, 0, rows - 1, columnId, isNumeric);
-    printCSV(entries, rows, columns);
+    printCSV(entries, rows, columns, originalData);
     free(cols);
     free(columns);
     free(entries);
