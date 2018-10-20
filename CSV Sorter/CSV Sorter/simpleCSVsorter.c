@@ -78,6 +78,10 @@ void printCSV(csventry* entries, int rows, csventry* columnArr){
 
 int main(int varc, char* argv[])
 {
+    if (varc !=2 || strcmp(argv[1], "-c") != 0 ) {
+        printf("ERROR: Incorrect Arguments, 2 arguments required. Usage: -c *column name you wish to be sorted*.\n");
+	exit(1);
+    }
     originalData = malloc(dataSize * sizeof(char*));
     entries = malloc(arraySize);
     char *buffer = NULL;
@@ -107,17 +111,13 @@ int main(int varc, char* argv[])
         return 1;
     }
     checkNumeric(argv[2]);
-    int a;
-    for (a = 0; a < 15; a++) {
-    int i, j;
-    for (i = 0; i < getSize(columns->data[a]); i++) {
+    int i;
+    for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
         //replace whitespaces at end of certain column names
-        char c = columns->data[a][i];
-        if (c != 13 && c != 10) {
-            columns->data[a][j++] = c;
+        char c = columns->data[columnSize - 1][i];
+        if (c == 13 || c == 10) {
+            columns->data[columnSize - 1][i] = '\0';
         }
-    }
-        columns->data[a][j] = '\0';
     }
     int rows = 0;
     while (getline(&buffer, &size, stdin) != -1)
@@ -135,8 +135,10 @@ int main(int varc, char* argv[])
         entry.data = malloc(actualSize * 2);
         currSize += actualSize * 2;
         int ind = 0;
+	int columnCount = 0;
         char* tok = getFirstValue(buffer, ind);
         while(tok != NULL) {
+	    columnCount++;
             int tokSize = getSize(tok);
             entry.data[index] = malloc(tokSize + 1);
             strcpy(entry.data[index], tok);
@@ -145,6 +147,11 @@ int main(int varc, char* argv[])
             tok = getFirstValue(buffer, ind);
             index++;
         }
+	if (columnCount != columnSize) {
+	    printf("ERROR: Data column size (%d) does not match data header size (%d).\n", columnCount, columnSize);
+	    exit(1);
+	
+	}
         if (currSize > arraySize) {
             arraySize *= 2;
             csventry *adjustSize = malloc(arraySize);
