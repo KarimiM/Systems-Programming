@@ -62,7 +62,7 @@ void traverseDirectory(char * directory) {
     exit(1+processes);
 }
 
-int main(void)
+int main(int varc, char* argv[])
 {
     char *directory = "/ilab/users/mkk102/jay shah";
     int count = 0;
