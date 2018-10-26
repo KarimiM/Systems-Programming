@@ -15,30 +15,14 @@
 #include "simpleCSVsorter.h"
 #include "mergesort.c"
 
-csventry *columns;
-csventry *entries;
-
-char** originalData;
-
-int dataSize = 1000;
-
-int dataIndex = 0;
-
-int columnSize = 0;
-
-int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
-
-int arraySize = 1000;
-
-int currSize = 0;
-
 const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews", "duration", "director_facebook_likes", "actor_3_facebook_likes", "actor_2_name", "actor_1_facebook_likes", "gross", "genres", "actor_1_name", "movie_title", "num_voted_users", "cast_total_facebook_likes", "actor_3_name", "facenumber_in_poster", "plot_keywords", "movie_imdb_link", "num_user_for_reviews", "language", "country", "content_rating", "budget", "title_year", "actor_2_facebook_likes", "imdb_score", "aspect_ratio", "movie_facebook_likes" };
 
-int isNumeric = 0;
 
-void checkNumeric(char *columnName) {
+const int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
+
+void checkNumeric(char *columnName, int * isNumeric) {
     if (strcmp(columnName,"duration") == 0 || strcmp(columnName, "movie_facebook_likes") == 0) {
-        isNumeric = 1;
+        *isNumeric = 1;
         return;
     }
     int i;
@@ -48,7 +32,7 @@ void checkNumeric(char *columnName) {
             int j;
             for (j = 0; j < 14; j++) {
                 if (columnNumericIds[j] == i) {
-                    isNumeric = 1;
+                    *isNumeric = 1;
                 }
             }
             break;
@@ -56,9 +40,19 @@ void checkNumeric(char *columnName) {
     }
 }
 
-int checkForColumn(char* check)
+int checkForColumn(char* check, int columnSize, csventry *columns)
 {
     int i;
+    int exists = 0;
+    for (i = 0; i < 28; i++) {
+        if (strcmp(check, columnTitles[i]) == 0) {
+            exists = 1;
+            break;
+        }
+    }
+    if (exists == 0) {
+        return -1;
+    }
     for(i = 0; i < columnSize; i++){
         if(strcmp(columns->data[i],check) == 0){
             return i;
@@ -67,26 +61,67 @@ int checkForColumn(char* check)
     return -1;
 }
 
-void printCSV(csventry* entries, int rows, csventry* columnArr){
-    printf("%s", originalData[0]);
+void printCSV(char * fileName, char * outputDirectory, char * field, csventry* entries, int rows, csventry* columnArr, char** originalData){
+    
+    char add[] = "sorted";
+    
+    char * newFile = malloc(strlen(fileName) + strlen(add) + strlen(field) + 3);
+    
+    strcpy(newFile, fileName);
+    strcat(newFile, "-");
+    strcat(newFile, add);
+    strcat(newFile, "-");
+    strcat(newFile, field);
+    strcat(newFile, '\0');
+    
+    char * absolute_path = malloc(strlen(outputDirectory) + strlen(newFile) + 2);
+    strcpy(absolute_path, outputDirectory);
+    strcat(absolute_path, "/");
+    strcat(absolute_path, newFile);
+    strcat(absolute_path, '\0');
+    
+    FILE * fp;
+    fp = fopen(absolute_path, "w");
+    fprintf(fp, "%s", originalData[0]);
     int i;
     for (i = 0; i < rows; i++) {
         int index = entries[i].originalIndex;
-        printf("%s", originalData[index + 1]);
+        fprintf(fp, "%s", originalData[index + 1]);
     }
+    fclose(fp);
 }
 
-int main(int varc, char* argv[])
+int sort(char * fileDirectory, char * fileName, char * field, char * outputDirectory)
 {
-    if (varc !=2 || strcmp(argv[1], "-c") != 0 ) {
-        printf("ERROR: Incorrect Arguments, 2 arguments required. Usage: -c *column name you wish to be sorted*.\n");
-        exit(1);
+    FILE * fp;
+    
+    csventry *columns;
+    
+    csventry *entries;
+    
+    char** originalData;
+    
+    int dataSize = 1000;
+    
+    int dataIndex = 0;
+    
+    int columnSize = 0;
+    
+    int arraySize = 1000;
+    
+    int currSize = 0;
+    
+    int * isNumeric = calloc(1, sizeof(int*));
+    fp = fopen(fileDirectory, "r");
+    if (fp == NULL) {
+        printf("ERROR, CSV File cant open!");
+        return 1;
     }
     originalData = malloc(dataSize * sizeof(char*));
     entries = malloc(arraySize);
     char *buffer = NULL;
     size_t size;
-    if (getline(&buffer, &size, stdin) == -1) {
+    if (getline(&buffer, &size, fp) == -1) {
         printf("No input\n");
         return 0;
     }
@@ -105,12 +140,12 @@ int main(int varc, char* argv[])
     originalData[dataIndex++] = bufferCopy;
     columns = malloc(sizeof(cols));
     columns->data = cols;
-    int columnId = checkForColumn(argv[2]);
+    int columnId = checkForColumn(field, columnSize, columns);
     if (columnId == -1) {
         printf("ERROR: Column in argument does not exist.");
         return 1;
     }
-    checkNumeric(argv[2]);
+    checkNumeric(field, isNumeric);
     int i;
     for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
         //replace whitespaces at end of certain column names
@@ -120,7 +155,7 @@ int main(int varc, char* argv[])
         }
     }
     int rows = 0;
-    while (getline(&buffer, &size, stdin) != -1)
+    while (getline(&buffer, &size, fp) != -1)
     {
         char* buffCopy = malloc(size);
         strncpy(buffCopy, buffer, size);
@@ -164,10 +199,11 @@ int main(int varc, char* argv[])
         rows++;
     }
     mergesorts(entries, 0, rows - 1, columnId, isNumeric);
-    printCSV(entries, rows, columns);
+    printCSV(fileName, outputDirectory, field, entries, rows, columns, originalData);
     free(cols);
     free(columns);
     free(entries);
+    free(isNumeric);
     return 0;
     
 }
