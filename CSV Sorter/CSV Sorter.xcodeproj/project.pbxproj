@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		03319C85215960930035FC59 /* simpleCSVsorter.c in Sources */ = {isa = PBXBuildFile; fileRef = 03319C83215960930035FC59 /* simpleCSVsorter.c */; };
 		03319C87215960AE0035FC59 /* mergesort.c in Sources */ = {isa = PBXBuildFile; fileRef = 03319C86215960AE0035FC59 /* mergesort.c */; };
+		036BDF8E2183AE7B0009AD8B /* sorter.c in Sources */ = {isa = PBXBuildFile; fileRef = 036BDF8D2183AE7B0009AD8B /* sorter.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,7 @@
 		03319C83215960930035FC59 /* simpleCSVsorter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simpleCSVsorter.c; sourceTree = "<group>"; };
 		03319C84215960930035FC59 /* simpleCSVsorter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simpleCSVsorter.h; sourceTree = "<group>"; };
 		03319C86215960AE0035FC59 /* mergesort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mergesort.c; sourceTree = "<group>"; };
+		036BDF8D2183AE7B0009AD8B /* sorter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sorter.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				03319C83215960930035FC59 /* simpleCSVsorter.c */,
 				03319C84215960930035FC59 /* simpleCSVsorter.h */,
 				03319C86215960AE0035FC59 /* mergesort.c */,
+				036BDF8D2183AE7B0009AD8B /* sorter.c */,
 			);
 			path = "CSV Sorter";
 			sourceTree = "<group>";
@@ -125,6 +128,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				03319C87215960AE0035FC59 /* mergesort.c in Sources */,
+				036BDF8E2183AE7B0009AD8B /* sorter.c in Sources */,
 				03319C85215960930035FC59 /* simpleCSVsorter.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
