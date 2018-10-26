@@ -35,7 +35,7 @@ char* getFirstValue(char* entry, int startIndex)
     int i;
     for (i = startIndex; i <= endIndex - 1; i++)
     {
-        if (i == endIndex - 1) {
+        if (i == endIndex - 2) {
             char* value = malloc(i - startIndex);
             memcpy(value, &entry[startIndex], i - startIndex);
             value[i-startIndex] = '\0';
