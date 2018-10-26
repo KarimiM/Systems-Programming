@@ -62,28 +62,32 @@ int checkForColumn(char* check, int columnSize, csventry *columns)
 }
 
 void printCSV(char * fileName, char * outputDirectory, char * field, csventry* entries, int rows, csventry* columnArr, char** originalData){
-    
     char add[] = "sorted";
-    
-    char * newFile = malloc(strlen(fileName) + strlen(add) + strlen(field) + 3);
+    int i;
+    for (i = 0; i < strlen(fileName); i++) {
+        if (fileName[i] == '.') {
+            fileName[i] = '\0';
+            break;
+        }
+    }
+    char * newFile = malloc(strlen(fileName) + strlen(add) + strlen(field) + 7);
     
     strcpy(newFile, fileName);
     strcat(newFile, "-");
     strcat(newFile, add);
     strcat(newFile, "-");
     strcat(newFile, field);
-    strcat(newFile, '\0');
+    strcat(newFile, ".csv");
     
     char * absolute_path = malloc(strlen(outputDirectory) + strlen(newFile) + 2);
     strcpy(absolute_path, outputDirectory);
-    strcat(absolute_path, "/");
     strcat(absolute_path, newFile);
-    strcat(absolute_path, '\0');
-    
     FILE * fp;
     fp = fopen(absolute_path, "w");
+    if (fp == NULL) {
+        puts("FP IS NULL");
+    }
     fprintf(fp, "%s", originalData[0]);
-    int i;
     for (i = 0; i < rows; i++) {
         int index = entries[i].originalIndex;
         fprintf(fp, "%s", originalData[index + 1]);
@@ -114,7 +118,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     int * isNumeric = calloc(1, sizeof(int*));
     fp = fopen(fileDirectory, "r");
     if (fp == NULL) {
-        printf("ERROR, CSV File cant open!");
+        puts("ERROR, CSV File cant open!");
         return 1;
     }
     originalData = malloc(dataSize * sizeof(char*));
@@ -122,7 +126,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     char *buffer = NULL;
     size_t size;
     if (getline(&buffer, &size, fp) == -1) {
-        printf("No input\n");
+        puts("No input\n");
         return 0;
     }
     int actualSize = getSize(buffer);
@@ -142,7 +146,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     columns->data = cols;
     int columnId = checkForColumn(field, columnSize, columns);
     if (columnId == -1) {
-        printf("ERROR: Column in argument does not exist.");
+        puts("ERROR: Column in argument does not exist.");
         return 1;
     }
     checkNumeric(field, isNumeric);
@@ -183,7 +187,8 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
             index++;
         }
         if (columnCount != columnSize) {
-            printf("ERROR: Data column size (%d) does not match data header size (%d).\n", columnCount, columnSize);
+            puts("ERROR:");
+            //Data column size (%d) does not match data header size (%d).\n", columnCount, columnSize);
             exit(1);
             
         }
