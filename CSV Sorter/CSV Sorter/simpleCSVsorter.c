@@ -85,7 +85,7 @@ void printCSV(char * fileName, char * outputDirectory, char * field, csventry* e
     FILE * fp;
     fp = fopen(absolute_path, "w");
     if (fp == NULL) {
-        puts("FP IS NULL");
+        fprintf(strerr, "File Pointer is NULL\n");
     }
     fprintf(fp, "%s", originalData[0]);
     for (i = 0; i < rows; i++) {
@@ -118,7 +118,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     int * isNumeric = calloc(1, sizeof(int*));
     fp = fopen(fileDirectory, "r");
     if (fp == NULL) {
-        puts("ERROR, CSV File cant open!");
+        fprintf(strerr, "CSV File cannot open!\n");
         return 1;
     }
     originalData = malloc(dataSize * sizeof(char*));
@@ -126,7 +126,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     char *buffer = NULL;
     size_t size;
     if (getline(&buffer, &size, fp) == -1) {
-        puts("No input\n");
+        fprintf(strerr, "No input\n");
         return 0;
     }
     int actualSize = getSize(buffer);
@@ -146,7 +146,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     columns->data = cols;
     int columnId = checkForColumn(field, columnSize, columns);
     if (columnId == -1) {
-        puts("ERROR: Column in argument does not exist.");
+        fprintf(strerr, "Column in argument does not exist.\n");
         return 1;
     }
     checkNumeric(field, isNumeric);
@@ -187,7 +187,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
             index++;
         }
         if (columnCount != columnSize) {
-            puts("ERROR:");
+            fprintf(strerr, "ERROR, Wrong number of columns!");
             //Data column size (%d) does not match data header size (%d).\n", columnCount, columnSize);
             exit(1);
             
