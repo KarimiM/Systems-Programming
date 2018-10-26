@@ -44,15 +44,18 @@ void traverseDirectory(char * directory, char * field, char * outputDirectory) {
                 wait(&status);
             }
         } else {
-            pid_t pid = fork();
-            if (pid == 0) {
-                if(strstr(de->d_name, ".csv") != NULL) {
-                    printf("Sorting found csv file!\n");
+            
+            if(strstr(de->d_name, ".csv") != NULL) {
+                pid_t pid = fork();
+                if (pid == 0) {
+                    printf("Sorting found csv file! %s\n", de->d_name);
                     sort(absolute_path, de->d_name, field, outputDirectory);
+                    
+                    _exit(2);
+                } else {
+                    children[index++] = pid;
+                    wait(&status);
                 }
-            } else {
-                children[index++] = pid;
-                wait(&status);
             }
         }
     }
@@ -82,7 +85,7 @@ int main(int argc, char* argv[])
     char * directory = cwd;
     char * outputDirectory = NULL;
     if(argc < 3 || argc >7 || argc == 2 || argc == 4 || argc == 6){
-        printf("ERROR: Incorrect imput, please enter valid number of arguments");
+        printf("ERROR: Incorrect imput, please enter valid number of arguments, %d\n", argc);
         return 1;
     }
     
@@ -99,7 +102,7 @@ int main(int argc, char* argv[])
             return 1;
         }
         directory = malloc(strlen(argv[4]));
-        *directory = *argv[4];
+        strcpy(directory, argv[4]);
     }
     
     if(argc == 7){
@@ -108,7 +111,7 @@ int main(int argc, char* argv[])
             return 1;
         }
         outputDirectory = malloc(strlen(argv[6]));
-        *outputDirectory = *argv[6];
+        strcpy(outputDirectory, argv[6]);
     }
     original = getpid();
     traverseDirectory(directory, argv[2], outputDirectory);

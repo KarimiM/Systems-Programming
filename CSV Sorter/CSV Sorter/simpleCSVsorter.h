@@ -10,6 +10,7 @@
 #define simplerCSVsorter_h
 
 #include <stdio.h>
+#include <ctype.h>
 
 typedef struct csventry {
     char** data;
@@ -29,13 +30,33 @@ int getSize(char *array)
     return size;
 }
 
+char *trimwhitespace(char *str)
+{
+    char *end;
+    
+    // Trim leading space
+    while(isspace((unsigned char)*str)) str++;
+    
+    if(*str == 0)  // All spaces?
+        return str;
+    
+    // Trim trailing space
+    end = str + strlen(str) - 1;
+    while(end > str && isspace((unsigned char)*end)) end--;
+    
+    // Write new null terminator character
+    end[1] = '\0';
+    
+    return str;
+}
+
 char* getFirstValue(char* entry, int startIndex)
 {
     int endIndex = getSize(entry);
     int i;
     for (i = startIndex; i <= endIndex - 1; i++)
     {
-        if (i == endIndex - 2) {
+        if (i == endIndex - 1) {
             char* value = malloc(i - startIndex);
             memcpy(value, &entry[startIndex], i - startIndex);
             value[i-startIndex] = '\0';

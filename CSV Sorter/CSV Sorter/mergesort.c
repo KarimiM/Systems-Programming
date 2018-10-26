@@ -8,26 +8,26 @@ int cmpString(char* str1, char* str2){
     int i = 0, j = 0, trailing = 0;
     for (i = 0; i < getSize(str1); i++) {
         char c = str1[i];
-        if ((c == 10 || c == 13 && trailing == 0) || c == '"') {
+        if ((c == 10 || (c == 13 && trailing == 0)) || c == '"') {
             continue;
         }
-            str1[j++] = c;
-            trailing = 1;
+        str1[j++] = c;
+        trailing = 1;
     }
     if (j != i)
-         str1[j] = '\0';
+        str1[j] = '\0';
     trailing = 0;
     j = 0;
     for (i = 0; i < getSize(str2); i++) {
         char c = str2[i];
-       if ((c == 10 || c == 13 && trailing == 0) || c == '"') {
+        if ((c == 10 || (c == 13 && trailing == 0)) || c == '"') {
             continue;
         }
-            str2[j++] = c;
-            trailing = 1;
+        str2[j++] = c;
+        trailing = 1;
     }
     if (j != i)
-            str2[j] = '\0';
+        str2[j] = '\0';
     int result = strcmp(str1, str2);
     if(result <= 0) return 1;
     else return 0;
