@@ -1,187 +1,126 @@
 
-//
-//  simplerCSVsorter.c
-//  CSV Sorter
-//
-//  Created by Masood Karimi on 9/24/18.
-//  Copyright © 2018 Masood Karimi. All rights reserved.
-//
 #include <stdio.h>
+#include <dirent.h>
 #include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <time.h>
-#include <sys/stat.h>
-#include "simpleCSVsorter.h"
-#include "mergesort.c"
+#include<sys/stat.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<stdlib.h>
 
-const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews", "duration", "director_facebook_likes", "actor_3_facebook_likes", "actor_2_name", "actor_1_facebook_likes", "gross", "genres", "actor_1_name", "movie_title", "num_voted_users", "cast_total_facebook_likes", "actor_3_name", "facenumber_in_poster", "plot_keywords", "movie_imdb_link", "num_user_for_reviews", "language", "country", "content_rating", "budget", "title_year", "actor_2_facebook_likes", "imdb_score", "aspect_ratio", "movie_facebook_likes" };
+pid_t arr[255];
 
+int * currIndex;
+int status;
+int original;
 
-const int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
+void addPidToArray(pid_t pid) {
+    int index = *currIndex;
+    arr[index] = pid;
+    *currIndex = index+1;
+}
 
-void checkNumeric(char *columnName, int * isNumeric) {
-    if (strcmp(columnName,"duration") == 0 || strcmp(columnName, "movie_facebook_likes") == 0) {
-        *isNumeric = 1;
+void traverseDirectory(char * directory) {
+    int childCount=0;
+    int * childIds=(int *)malloc(sizeof(int)*255);
+    int childProcesses = 0;
+    struct dirent *de;
+    DIR *dr = opendir(directory);
+    if (dr == NULL)  // opendir returns NULL if couldn't open directory
+    {
+        printf("NULL");
         return;
     }
-    int i;
-    for (i = 0; i < 28; i++) {
-        if (strcmp(columnName,columnTitles[i]) == 0) {
-        
-            int j;
-            for (j = 0; j < 14; j++) {
-                if (columnNumericIds[j] == i) {
-                    *isNumeric = 1;
-                }
+    while ((de = readdir(dr)) != NULL) {
+        struct stat path_stat;
+        stat(de->d_name, &path_stat);
+        if (strcmp(de->d_name, "..") == 0 || strcmp(de->d_name, ".") == 0) {
+            continue;
+        }
+        char * check = strchr(de->d_name, '.');
+        char * absolute_path = malloc(strlen(directory) + strlen(de->d_name) + 2);
+        strcpy(absolute_path, directory);
+        strcat(absolute_path, "/");
+        strcat(absolute_path, de->d_name);
+        if (opendir(absolute_path) != NULL) {
+            pid_t pid = fork();
+            if (pid == 0) {
+                printf("Directories: %s\n", absolute_path);
+                traverseDirectory(absolute_path);
+                _exit(2);
+            } else {
+                printf("Adding pid: %d\n", pid);
+                childIds[childCount] = pid;
+                childCount++;
+                wait(&status);
             }
-            break;
         }
     }
-}
-
-int checkForColumn(char* check, int columnSize, csventry *columns)
-{
+    closedir(dr);
+    // _exit(0);
     int i;
-    int exists = 0;
-    for (i = 0; i < 28; i++) {
-        if (strcmp(check, columnTitles[i]) == 0) {
-           exists = 1;
-           break;
+    for (i=0;i<childCount;i++){
+        printf("Pid: %d\n", childIds[i]);
+        waitpid(childIds[i],&status,0);
+        if (WIFEXITED(status)){
+            childProcesses+=WEXITSTATUS(status);
+        }else{
+            printf("L\n");
         }
     }
-    if (exists == 0) {
-       return -1;
+    if(getpid()==original){
+        printf("\nWe done.");
+        //childProcesses=childProcesses>>8;
+        printf("\nTotal number of processes: %d\n",(1+childProcesses));
     }
-    for(i = 0; i < columnSize; i++){
-        if(strcmp(columns->data[i],check) == 0){
-            return i;
-        }
-    }
-    return -1;
+    exit(1+childProcesses);
 }
 
-void printCSV(csventry* entries, int rows, csventry* columnArr, char** originalData){
-    printf("%s", originalData[0]);
-    int i;
-    for (i = 0; i < rows; i++) {
-        int index = entries[i].originalIndex;
-        printf("%s", originalData[index + 1]);
-    }
-}
-
-int main(int varc, char* argv[])
+int main(void)
 {
-    if (varc !=3 || strcmp(argv[1], "-c") != 0 ) {
-        printf("ERROR: Incorrect Arguments, 2 arguments required. Usage: -c *column name you wish to be sorted*.\n");
-        exit(1);
-    }
+    currIndex = malloc(sizeof(int*));
+    *currIndex = 0;
+    char *directory = "/ilab/users/mkk102/jay shah";
+    struct dirent *de;  // Pointer for directory entry
     
-    csventry *columns;
-    
-    csventry *entries;
-    
-    char** originalData;
-    
-    int dataSize = 1000;
-    
-    int dataIndex = 0;
-    
-    int columnSize = 0;
-    
-    int arraySize = 1000;
-    
-    int currSize = 0;
-    
-    int * isNumeric = calloc(1, sizeof(int*));
-    
-    originalData = malloc(dataSize * sizeof(char*));
-    entries = malloc(arraySize);
-    char *buffer = NULL;
-    size_t size;
-    if (getline(&buffer, &size, stdin) == -1) {
-        printf("No input\n");
+    // opendir() returns a pointer of DIR type.
+    DIR *dr = opendir(directory);
+    int count = 0;
+    original = getpid();
+    if (dr == NULL)   // opendir returns NULL if couldn't open directory
+    {
+        printf("Could not open current directory" );
         return 0;
     }
-    int actualSize = getSize(buffer);
-    char** cols = malloc(actualSize * 2);
-    int currIndex = 0;
-    char* token = getFirstValue(buffer, currIndex);
-    while(token != NULL) {
-        cols[columnSize] = token;
-        currIndex += getSize(token) + 1;
-        token = getFirstValue(buffer, currIndex);
-        columnSize++;
-    }
-    char* bufferCopy = malloc(size);
-    strncpy(bufferCopy, buffer, size);
-    originalData[dataIndex++] = bufferCopy;
-    columns = malloc(sizeof(cols));
-    columns->data = cols;
-    int columnId = checkForColumn(argv[2], columnSize, columns);
-    if (columnId == -1) {
-        printf("ERROR: Column in argument does not exist.");
-        return 1;
-    }
-    checkNumeric(argv[2], isNumeric);
-    int i;
-    for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
-        //replace whitespaces at end of certain column names
-        char c = columns->data[columnSize - 1][i];
-        if (c == 13 || c == 10) {
-            columns->data[columnSize - 1][i] = '\0';
-        }
-    }
-    int rows = 0;
-    while (getline(&buffer, &size, stdin) != -1)
-    {
-        char* buffCopy = malloc(size);
-        strncpy(buffCopy, buffer, size);
-        if (dataIndex >= dataSize - 100) {
-            dataSize *= 2;
-            originalData = realloc(originalData, dataSize * sizeof(char*));
-        }
-        originalData[dataIndex++] = buffCopy;
-        int index = 0;
-        actualSize = getSize(buffer);
-        csventry entry;
-        entry.data = malloc(actualSize * 2);
-        currSize += actualSize * 2;
-        int ind = 0;
-	int columnCount = 0;
-        char* tok = getFirstValue(buffer, ind);
-        while(tok != NULL) {
-	    columnCount++;
-            int tokSize = getSize(tok);
-            entry.data[index] = malloc(tokSize + 1);
-            strcpy(entry.data[index], tok);
-            entry.data[index][tokSize] = '\0';
-            ind += tokSize + 1;
-            tok = getFirstValue(buffer, ind);
-            index++;
-        }
-	if (columnCount != columnSize) {
-	    printf("ERROR: Data column size (%d) does not match data header size (%d).\n", columnCount, columnSize);
-	    exit(1);
-	
-	}
-        if (currSize > arraySize) {
-            arraySize *= 2;
-            csventry *adjustSize = malloc(arraySize);
-            memcpy(adjustSize, entries, arraySize / 2);
-            free(entries);
-            entries = adjustSize;
-        }
-        entries[rows].data = entry.data;
-        entries[rows].originalIndex = rows;
-        rows++;
-    }
-    mergesorts(entries, 0, rows - 1, columnId, isNumeric);
-    printCSV(entries, rows, columns, originalData);
-    free(cols);
-    free(columns);
-    free(entries);
-    free(isNumeric);
-    return 0;
+    traverseDirectory(directory);
+    /* while ((de = readdir(dr)) != NULL) {
+     struct stat path_stat;
+     stat(de->d_name, &path_stat);
+     if (strcmp(de->d_name, "..") == 0 || strcmp(de->d_name, ".") == 0) {
+     continue;
+     }
+     char * check = strchr(de->d_name, '.');
+     char * absolute_path = malloc(strlen(directory) + strlen(de->d_name) + 1);
+     strcpy(absolute_path, directory);
+     strcat(absolute_path, de->d_name);
+     if (opendir(absolute_path) != NULL) {
+     printf("Directories: %s\n", absolute_path);
+     traverseDirectory(absolute_path);
+     }
+     }*/
+    closedir(dr);
     
+    
+    if(getpid()!=original){
+        printf("Exiting process.\n");
+        _exit(2);
+    } else {
+        wait(&status);
+    }
+    printf("did i get here\n");
+    int i;
+    
+    for (i = 0; i < *currIndex; i++) {
+        printf("PID: %d\n", arr[i]);
+    }
+    return 0;
 }
