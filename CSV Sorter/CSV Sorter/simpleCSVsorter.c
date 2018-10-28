@@ -120,7 +120,8 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     int * isNumeric = calloc(1, sizeof(int*));
     fp = fopen(fileDirectory, "r");
     if (fp == NULL) {
-        puts("ERROR, CSV File cant open!");
+        fprintf( stderr, "Error, CSV File cant open!\n");
+        //puts("ERROR, CSV File cant open!");
         return 1;
     }
     originalData = malloc(dataSize * sizeof(char*));
@@ -128,7 +129,8 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     char *buffer = NULL;
     size_t size;
     if (getline(&buffer, &size, fp) == -1) {
-        puts("No input\n");
+        fprintf(stderr, "No input\n");
+        //puts("No input\n");
         return 0;
     }
     int actualSize = getSize(buffer);
@@ -148,7 +150,8 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     columns->data = cols;
     int columnId = checkForColumn(field, columnSize, columns);
     if (columnId == -1) {
-        puts("ERROR: Column in argument does not exist.");
+        fprintf(stderr, "ERROR: Column in argument does not exist."\n);
+        //puts("ERROR: Column in argument does not exist.");
         return 1;
     }
     checkNumeric(field, isNumeric);
@@ -189,7 +192,8 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
             index++;
         }
         if (columnCount != columnSize) {
-            puts("ERROR:");
+            fprintf(stderr, "Error, not enough columns");
+            //puts("ERROR:");
             //Data column size (%d) does not match data header size (%d).\n", columnCount, columnSize);
             exit(1);
             
