@@ -150,7 +150,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     columns->data = cols;
     int columnId = checkForColumn(field, columnSize, columns);
     if (columnId == -1) {
-        fprintf(stderr, "ERROR: Column in argument does not exist."\n);
+        fprintf(stderr, "ERROR: Column in argument does not exist.\n");
         //puts("ERROR: Column in argument does not exist.");
         return 1;
     }
