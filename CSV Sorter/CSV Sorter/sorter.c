@@ -45,7 +45,7 @@ void traverseDirectory(char * directory, char * field, char * outputDirectory) {
             }
         } else {
             
-            if(strstr(de->d_name, ".csv") != NULL) {
+            if(strstr(de->d_name, ".csv") != NULL && strstr(de->d_name, "sorted") == NULL) {
                 pid_t pid = fork();
                 if (pid == 0) {
                     printf("Sorting found csv file! %s\n", de->d_name);
