@@ -1,10 +1,10 @@
 Partners: Stephen Quickel- svq3  Masood Karimi- mkk102
 
 To compile:
-gcc simpleCSVsorter.c -o simpleCSVsorter
+make all
 
 To run:
-cat movie_metadata.csv |./simpleCSVsorter -c movie_title  > out.csv 
+./scannerCSVsorter -c movie_title -d thisdir -o thatdir
 
 
 
@@ -36,14 +36,17 @@ Functions:
     Prints out the string based on the original lines rows using an indexing system which is preserved throughout the
     mergesort process so the format will be the exact same as the original and will be printed to the stdout.
   
-  int main(int varc, char* argv[]);
-The main method executes all the code to sort the CSV file. 
+ 
+The main method executes all the code to sort through the CSV files. 
+  This will first check for the proper inputs given from the command line and will call the fuctiion to begin traversing the directory.
 
 It starts off by allocating a set amount of data to two fields: an entries array and a double char array called originalData.
 
 Entries is an array of the struct csventry. It stores the trimmed and parsed data from the input file. The double char array originalData stores the original copies of every line in the input file. This is so we can output the exact data that was inputted even though we trim it to compare.
 
-The program starts by getting the first line from STDIN. If there is no lines or the document doesn’t exist, it will print out “No input”. We then call upon the helper function “getSize” in the simpleCSVsorter.h file in order to determine the size of the first line. We use this size to malloc a char double array called “cols”. This will store the buffer after we parse it and split it up. Each column will be it’s own array of chars in the double array. We wrote our own tokenizer, called “getFirstValue”, which will parse for commas/ignore whitespaces, and return the next value in the line. We also store a copy of the exact buffer in originalData.
+
+CSV Sorter:
+The program starts by getting the field on which to sort by as well as optional input directory and output directory. If there is no lines or the document doesn’t exist, it will print out “No input”. We then call upon the helper function “getSize” in the simpleCSVsorter.h file in order to determine the size of the first line. We use this size to malloc a char double array called “cols”. This will store the buffer after we parse it and split it up. Each column will be it’s own array of chars in the double array. We wrote our own tokenizer, called “getFirstValue”, which will parse for commas/ignore whitespaces, and return the next value in the line. We also store a copy of the exact buffer in originalData.
 
 After the columns are parsed, we try and determine if the column exists. We do this by have an array of strings called columnTitles. We loop through this array and use strcmp. If the given column argument doesn’t exist, we end the program and print out “Error: Column doesn’t Exists”. If the column exists, we then loop through the double char array “col” that we set earlier to find the match. Once the match is found we return the index it was found at and store it in a field for future use when comparing/sorting.
 
@@ -52,8 +55,6 @@ After we determine if and where the column exists in the inputted data, we check
 Now we need to parse the remaining data. This is done in a while loop where we continue to get each line of input from STDIN until there is no input left. In the while loop we begin by storing a copy of the line in the originalData. We make originalData dynamically adjust it size if it reaches capacity. This allows for us to store any amount of entries. After we store a copy of the line, we follow a similar procedure to parsing the columns. We get the size using the “getSize” function and malloc that space. Then we use the tokenizer “getFirstValue” to get the next value in the line. We store this value in a char array called tok. We then use getSize to get the size of the tok, and malloc that space for a new csventry struct. We then copy that data over to the struct using strcpy. At the end of this while loop, we call getFirstValue again and it continues until the tok is NULL. After the while loop is over, we store the data in the csventry array we declared and allocated earlier in the program. This array also dynamically adjusts its size so that we can handle any entry amount.
 
 Once this is done, all thats left is to sort them using mergesort and then print the results. The mergesort method sorts them in ascending order. After mergesort is completed we call printCSV. We then free the data and the program is complete.
-
-
 
 MergeSort Implementation:
   int cmpString(char* str1, char* str2);
@@ -65,6 +66,8 @@ MergeSort Implementation:
   void merge(csventry* entryArr, int low, int mid, int high, int colID, int numeric);
 The “merge” method takes in six parameters: a struct array for csventry, the low index, the mid index, the high index, the column Id we are comparing, and whether the column we are comparing is numeric. The merge method first declares two csventry arrays which will be used to represent the left and right half of the original array. We then loop through the original array and point the “left” array to all the values on the left half of the original array and the “right” array to all the values on the right half of the original array. Now we can conduct the comparisons. We do this via a while loop that essentially loops through every value in the left array and every value in the right array and comparing them against each other. The one that wins the comparison is inserted back into the original array at the start index (low parameter). This continues until there are no elements left to compare. Once there are no elements left to compare, the remaining elements from the left and right array are added on to the end of the original array (within the low-high parameter range).  
 
+
+
   void mergesorts(csventry* entryArr, int low, int high, int colID, int numeric);
     Starts with the array of csventry's and the low(0), high(length of the array), and we needed the
     columnID for printing the original format at the end as well as if the given field was numeric or
@@ -73,12 +76,19 @@ The “merge” method takes in six parameters: a struct array for csventry, the
     until only single csv entries remain and the merge at the bottom will go through this parsed array 
     switching entries that need to be reversed and keeping entries that are in the correct spot until
     only the final sorted array remains.
+    
+   void traverseDirectory(char * directory, char * field, char * outputDirectory)
+     This is the main function that will allow for forking and is passed the directory to work on as well its output directory and the        column to sort on.  Given the current directory this will begin traversing through the directory looking for other directories and CSV files which it will then fork() on these to create a new process.  Will not fork if given file is a csv and has the word sorted in its name.
+    
+    
 
 Predicted Run time: 
 
   Given that all the reads and print statement to the CSV file would be O(1) merge sort would be the defining funtion for this programs
-  which would be O(nlogn).
+  which would be O(nlogn) this would be multiplied by the number of processes, but because seperate processes can be handled simultaniously it will be faster than a single process iterating through.
   
 Assumptions:
-  Based on a Piazza post answered by the instructor it said to base all string sorting on how strcmp would judge all comparisons such as   some titles with quotes around titles may appear first based on strcmp function.
+  Are assuming that processes do not need to be created if file is already sorted.  Also that the initial PID will not be in process list or counted in the total count.
+  No files given will have the work sorted in their name as that would be incorrect naming if it was not already sorted.  These files will be passed over and not given a PID
+  
 
