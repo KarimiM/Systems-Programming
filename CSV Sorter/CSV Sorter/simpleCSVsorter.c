@@ -20,6 +20,7 @@ const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews
 
 const int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
 
+
 char *trimwhitespace(char *str)
 {
     char *end;
@@ -49,7 +50,7 @@ char* getFirstValue(char* entry, int startIndex)
     int i;
     for (i = startIndex; i <= endIndex - 1; i++)
     {
-        if (i == endIndex - 2) {
+        if (i == endIndex - 1) {
             char* value = malloc(i - startIndex);
             memcpy(value, &entry[startIndex], i - startIndex);
             value[i-startIndex] = '\0';
@@ -64,7 +65,6 @@ char* getFirstValue(char* entry, int startIndex)
             }
             memcpy(value, &entry[startIndex], i - startIndex);
             value[i-startIndex] = '\0';
-            trimwhitespace(value);
             return value;
         }
     }
@@ -105,7 +105,8 @@ int checkForColumn(char* check, int columnSize, csventry *columns)
         return -1;
     }
     for(i = 0; i < columnSize; i++){
-        if(strcmp(trimwhitespace(columns->data[i]),check) == 0){
+        printf("%s, %s\n", columns->data[i], check);
+        if(strcmp(columns->data[i],check) == 0){
             return i;
         }
     }
@@ -151,6 +152,7 @@ int printCSV(char * fileName, char * outputDirectory, char * field, csventry* en
 
 int sort(char * fileDirectory, char * fileName, char * field, char * outputDirectory)
 {
+    printf("%s\n", fileDirectory);
     int length = strlen(outputDirectory);
     char * newOutput = NULL;
     if (outputDirectory[length - 1] != '/') {
@@ -200,7 +202,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     int currIndex = 0;
     char* token = getFirstValue(buffer, currIndex);
     while(token != NULL) {
-        cols[columnSize] = token;
+        cols[columnSize] = trimwhitespace(token);
         currIndex += getSize(token) + 1;
         token = getFirstValue(buffer, currIndex);
         columnSize++;
@@ -240,7 +242,7 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
             columnCount++;
             int tokSize = getSize(tok);
             entry.data[index] = malloc(tokSize + 1);
-            strcpy(entry.data[index], tok);
+            strcpy(entry.data[index], trimwhitespace(tok));
             entry.data[index][tokSize] = '\0';
             ind += tokSize + 1;
             tok = getFirstValue(buffer, ind);
@@ -249,7 +251,11 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
         if (columnCount != columnSize) {
             fprintf(stderr, "Error, not enough columns");
             //puts("ERROR:");
-            //Data column size (%d) does not match data header size (%d).\n", columnCount, columnSize);
+            printf("Data column size (%d) does not match data header size (%d).\n", columnCount, columnSize);
+            int i;
+            for (i = 0; i < 28; i++) {
+                //printf("%s --- %s\n", entry.data[i], columns->data[i]);
+            }
             exit(1);
             
         }
