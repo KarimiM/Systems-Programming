@@ -59,7 +59,7 @@ void traverseDirectory(char * directory, char * field, char * outputDirectory) {
             } else {
                 addNewPid(pid);
                 printf("Adding pid; %d\n",pid);
-                waitpid(&status);
+                wait(&status);
             }
         } else {
             if(strstr(de->d_name, ".csv") != NULL && strstr(de->d_name, "sorted") == NULL) {
