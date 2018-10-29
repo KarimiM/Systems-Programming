@@ -25,6 +25,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		03109C0621866FF400A8840C /* mergesort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mergesort.h; sourceTree = "<group>"; };
 		03319C7921595F0E0035FC59 /* CSV Sorter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "CSV Sorter"; sourceTree = BUILT_PRODUCTS_DIR; };
 		03319C83215960930035FC59 /* simpleCSVsorter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simpleCSVsorter.c; sourceTree = "<group>"; };
 		03319C84215960930035FC59 /* simpleCSVsorter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simpleCSVsorter.h; sourceTree = "<group>"; };
@@ -66,6 +67,7 @@
 				03319C84215960930035FC59 /* simpleCSVsorter.h */,
 				03319C86215960AE0035FC59 /* mergesort.c */,
 				036BDF8D2183AE7B0009AD8B /* sorter.c */,
+				03109C0621866FF400A8840C /* mergesort.h */,
 			);
 			path = "CSV Sorter";
 			sourceTree = "<group>";

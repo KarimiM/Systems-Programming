@@ -7,14 +7,31 @@
 #include<sys/types.h>
 #include<stdlib.h>
 #include<limits.h>
-#include "simpleCSVsorter.c"
+#include "simpleCSVsorter.h"
 
+typedef struct node {
+    int pid;
+    struct node *next;
+} node;
+
+node * head;
 int status;
 int original;
 
+void addNewPid(int pid) {
+    node * curr = head;
+    node * prev = curr;
+    while (curr != NULL) {
+        prev = curr;
+        curr = curr->next;
+    }
+    node * add = (node *) malloc(sizeof(node));
+    add->pid = pid;
+    prev->next = add;
+}
+
 void traverseDirectory(char * directory, char * field, char * outputDirectory) {
     int index=0;
-    int * children=(int *)malloc(sizeof(int)*255);
     int processes = 0;
     struct dirent *de;
     DIR *dr = opendir(directory);
@@ -38,22 +55,22 @@ void traverseDirectory(char * directory, char * field, char * outputDirectory) {
             if (pid == 0) {
                 printf("Directories: %s\n", absolute_path);
                 traverseDirectory(absolute_path, field, outputDirectory);
-                _exit(2);
+                _exit(1);
             } else {
-                children[index++] = pid;
-                wait(&status);
+                addNewPid(pid);
+                printf("Adding pid; %d\n",pid);
+                waitpid(&status);
             }
         } else {
-            
             if(strstr(de->d_name, ".csv") != NULL && strstr(de->d_name, "sorted") == NULL) {
                 pid_t pid = fork();
                 if (pid == 0) {
-                    printf("Sorting found csv file! %s\n", de->d_name);
-                    sort(absolute_path, de->d_name, field, outputDirectory);
-                    
-                    _exit(2);
+                    puts("Sorting csv file");
+                    // int val = sort(absolute_path, de->d_name, field, outputDirectory == NULL ? directory : outputDirectory);
+                    _exit(1);
                 } else {
-                    children[index++] = pid;
+                    addNewPid(pid);
+                    printf("Adding pid; %d\n", pid);
                     wait(&status);
                 }
             }
@@ -61,14 +78,18 @@ void traverseDirectory(char * directory, char * field, char * outputDirectory) {
     }
     closedir(dr);
     // _exit(0);
-    int i;
-    for (i=0;i<index;i++){
-        waitpid(children[i],&status,0);
-        if (WIFEXITED(status)){
-            processes+=WEXITSTATUS(status);
-        }
-    }
+    pid_t wpid;
+    int stat = 0;
+    while ((wpid = wait(&stat)) > 0);
+    
     if(getpid()==original){
+        printf("PIDS: ");
+        node * ptr = head;
+        while (ptr != NULL ) {
+            printf("%d\n", ptr->pid);
+            ptr = ptr->next;
+        }
+        
         printf("\nTotal number of processes: %d\n",(1+processes));
     }
     exit(1+processes);
@@ -113,6 +134,7 @@ int main(int argc, char* argv[])
         outputDirectory = malloc(strlen(argv[6]));
         strcpy(outputDirectory, argv[6]);
     }
+    head = (node *)malloc(sizeof(node));
     original = getpid();
     traverseDirectory(directory, argv[2], outputDirectory);
     

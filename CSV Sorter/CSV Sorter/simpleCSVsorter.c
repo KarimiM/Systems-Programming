@@ -13,12 +13,63 @@
 #include <time.h>
 #include <sys/stat.h>
 #include "simpleCSVsorter.h"
-#include "mergesort.c"
+#include "mergesort.h"
 
 const char *columnTitles[] = { "color", "director_name", "num_critic_for_reviews", "duration", "director_facebook_likes", "actor_3_facebook_likes", "actor_2_name", "actor_1_facebook_likes", "gross", "genres", "actor_1_name", "movie_title", "num_voted_users", "cast_total_facebook_likes", "actor_3_name", "facenumber_in_poster", "plot_keywords", "movie_imdb_link", "num_user_for_reviews", "language", "country", "content_rating", "budget", "title_year", "actor_2_facebook_likes", "imdb_score", "aspect_ratio", "movie_facebook_likes" };
 
 
 const int columnNumericIds[] = {2, 4, 5, 7, 8, 12, 13, 15, 18, 22, 23, 24, 25, 26, 27};
+
+char *trimwhitespace(char *str)
+{
+    char *end;
+    while(isspace((unsigned char)*str)) str++;
+    
+    if(*str == 0)
+        return str;
+    end = str + strlen(str) - 1;
+    while(end > str && isspace((unsigned char)*end)) end--;
+    end[1] = '\0';
+    
+    return str;
+}
+int getSize(char *array)
+{
+    int size = 0;
+    int i;
+    for (i = 0; array[i] != '\0'; i++) {
+        size++;
+    }
+    return size;
+}
+
+char* getFirstValue(char* entry, int startIndex)
+{
+    int endIndex = getSize(entry);
+    int i;
+    for (i = startIndex; i <= endIndex - 1; i++)
+    {
+        if (i == endIndex - 2) {
+            char* value = malloc(i - startIndex);
+            memcpy(value, &entry[startIndex], i - startIndex);
+            value[i-startIndex] = '\0';
+            return value;
+            
+        }
+        if (entry[i] == ',' ) {
+            char* value = malloc(i - startIndex + 1);
+            if (i - startIndex == 0) {
+                value[0] = '\0';
+                return value;
+            }
+            memcpy(value, &entry[startIndex], i - startIndex);
+            value[i-startIndex] = '\0';
+            trimwhitespace(value);
+            return value;
+        }
+    }
+    return NULL;
+}
 
 void checkNumeric(char *columnName, int * isNumeric) {
     if (strcmp(columnName,"duration") == 0 || strcmp(columnName, "movie_facebook_likes") == 0) {
@@ -54,7 +105,6 @@ int checkForColumn(char* check, int columnSize, csventry *columns)
         return -1;
     }
     for(i = 0; i < columnSize; i++){
-        printf("Column: %s\n", columns->data[i]);
         if(strcmp(trimwhitespace(columns->data[i]),check) == 0){
             return i;
         }
@@ -62,7 +112,7 @@ int checkForColumn(char* check, int columnSize, csventry *columns)
     return -1;
 }
 
-void printCSV(char * fileName, char * outputDirectory, char * field, csventry* entries, int rows, csventry* columnArr, char** originalData){
+int printCSV(char * fileName, char * outputDirectory, char * field, csventry* entries, int rows, csventry* columnArr, char** originalData){
     char add[] = "sorted";
     char * ptr = fileName;
     int i;
@@ -87,7 +137,8 @@ void printCSV(char * fileName, char * outputDirectory, char * field, csventry* e
     FILE * fp;
     fp = fopen(absolute_path, "w");
     if (fp == NULL) {
-        puts("FP IS NULL");
+        fprintf(stderr, "File Output location IS NULL!\n");
+        return 1;
     }
     fprintf(fp, "%s", originalData[0]);
     for (i = 0; i < rows; i++) {
@@ -95,10 +146,21 @@ void printCSV(char * fileName, char * outputDirectory, char * field, csventry* e
         fprintf(fp, "%s", originalData[index + 1]);
     }
     fclose(fp);
+    return 0;
 }
 
 int sort(char * fileDirectory, char * fileName, char * field, char * outputDirectory)
 {
+    int length = strlen(outputDirectory);
+    char * newOutput = NULL;
+    if (outputDirectory[length - 1] != '/') {
+        newOutput = malloc(length + 2);
+        strcpy(newOutput, outputDirectory);
+        strcat(newOutput, "/");
+    } else {
+        newOutput = outputDirectory;
+    }
+    
     FILE * fp;
     
     csventry *columns;
@@ -156,13 +218,6 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
     }
     checkNumeric(field, isNumeric);
     int i;
-    for (i = 0; i < getSize(columns->data[columnSize - 1]); i++) {
-        //replace whitespaces at end of certain column names
-        char c = columns->data[columnSize - 1][i];
-        if (c == 13 || c == 10) {
-            columns->data[columnSize - 1][i] = '\0';
-        }
-    }
     int rows = 0;
     while (getline(&buffer, &size, fp) != -1)
     {
@@ -210,11 +265,11 @@ int sort(char * fileDirectory, char * fileName, char * field, char * outputDirec
         rows++;
     }
     mergesorts(entries, 0, rows - 1, columnId, isNumeric);
-    printCSV(fileName, outputDirectory, field, entries, rows, columns, originalData);
+    int check = printCSV(fileName, newOutput, field, entries, rows, columns, originalData);
     free(cols);
     free(columns);
     free(entries);
     free(isNumeric);
-    return 0;
+    return check;
     
 }
